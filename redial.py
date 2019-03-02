@@ -1,6 +1,8 @@
-import urwid
-import read_ssh_config
 import os
+
+import urwid
+
+from utils import *
 
 
 class MenuButton(urwid.Button):
@@ -46,37 +48,6 @@ def exit_program(key):
     raise urwid.ExitMainLoop()
 
 
-hosts = read_ssh_config.getHosts()
-host_menu = []
-
-for h in hosts:
-    host_menu.append(Choice(h.full_name))
-
-menu_top = SubMenu(u'Main Menu', [
-    SubMenu(u'Saved SSH Sessions', host_menu),
-    SubMenu(u'Docker Containers', [
-        Choice(u'wip'),
-    ]),
-    SubMenu(u'K8S pods', [
-        Choice(u'wip'),
-    ]),
-])
-
-palette = [
-    (None, 'light gray', 'black'),
-    ('heading', 'black', 'light gray'),
-    ('line', 'black', 'light gray'),
-    ('options', 'dark gray', 'black'),
-    ('focus heading', 'white', 'dark red'),
-    ('focus line', 'black', 'dark red'),
-    ('focus options', 'black', 'light gray'),
-    ('selected', 'white', 'dark blue')]
-focus_map = {
-    'heading': 'focus heading',
-    'options': 'focus options',
-    'line': 'focus line'}
-
-
 class HorizontalBoxes(urwid.Columns):
     def __init__(self):
         super(HorizontalBoxes, self).__init__([], dividechars=1)
@@ -92,6 +63,36 @@ class HorizontalBoxes(urwid.Columns):
 class selection: pass
 
 
+palette = [
+    (None, 'light gray', 'black'),
+    ('heading', 'black', 'light gray'),
+    ('line', 'black', 'light gray'),
+    ('options', 'dark gray', 'black'),
+    ('focus heading', 'white', 'dark red'),
+    ('focus line', 'black', 'dark red'),
+    ('focus options', 'black', 'light gray'),
+    ('selected', 'white', 'dark blue')]
+focus_map = {
+    'heading': 'focus heading',
+    'options': 'focus options',
+    'line': 'focus line'}
+
+hosts = read_ssh_config()
+host_menu = []
+
+for h in hosts:
+    host_menu.append(Choice(h.full_name))
+
+menu_top = SubMenu(u'Main Menu', [
+    SubMenu(u'Saved SSH Sessions', host_menu),
+    SubMenu(u'Docker Containers', [
+        Choice(u'wip'),
+    ]),
+    SubMenu(u'K8S pods', [
+        Choice(u'wip'),
+    ]),
+])
+
 selection.ssh = ""
 
 top = HorizontalBoxes()
@@ -99,4 +100,5 @@ top.open_box(menu_top.menu)
 urwid.MainLoop(urwid.Filler(top, 'middle', 20), palette).run()
 
 if selection.ssh != "":
+    print("ssh " + selection.ssh)
     os.system("ssh " + selection.ssh)
