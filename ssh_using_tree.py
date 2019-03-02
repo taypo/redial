@@ -30,7 +30,7 @@ class ExampleTreeWidget(urwid.TreeWidget):
         """allow subclasses to intercept keystrokes"""
         key = self.__super.keypress(size, key)
 
-        if key in ("-", "left"):
+        if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
             self.update_expanded_icon()
 
@@ -77,6 +77,21 @@ class ExampleTreeWidget(urwid.TreeWidget):
         else:
             self._w.attr = 'body'
             self._w.focus_attr = 'focus'
+
+
+class ExampleTreeListBox(urwid.TreeListBox):
+
+    def keypress(self, size, key):
+        if key == "left":
+            widget, pos = self.body.get_focus()
+            self.keypress(size, "-")
+            parent_widget, parent_pos = self.body.get_focus()
+
+            if pos == parent_pos and size[1] > 2:
+                self.move_focus_to_parent(size)
+
+        else:
+            self.__super.keypress(size, key)
 
 
 class ExampleNode(urwid.TreeNode):
@@ -148,7 +163,7 @@ class ExampleTreeBrowser:
 
     def __init__(self, data=None):
         self.topnode = ExampleParentNode(data)
-        self.listbox = urwid.TreeListBox(urwid.TreeWalker(self.topnode))
+        self.listbox = ExampleTreeListBox(urwid.TreeWalker(self.topnode))
         self.listbox.offset_rows = 1
         self.header = urwid.Text("")
         self.footer = urwid.AttrWrap(urwid.Text(self.footer_text),
