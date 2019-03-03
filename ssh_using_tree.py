@@ -89,6 +89,8 @@ class ExampleTreeListBox(urwid.TreeListBox):
 
             if pos == parent_pos and size[1] > 2:
                 self.move_focus_to_parent(size)
+        elif key in ('q', 'Q'):
+            exit_program()
 
         else:
             self.__super.keypress(size, key)
