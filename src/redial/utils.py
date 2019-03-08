@@ -1,6 +1,6 @@
 from os.path import expanduser
 
-from hostinfo import *
+from src.redial.hostinfo import *
 
 
 def read_ssh_config():

@@ -3,8 +3,8 @@ import signal
 
 import urwid
 
-from tree.node import Node
-from utils import read_ssh_config
+from src.redial.tree.node import Node
+from src.redial.utils import read_ssh_config
 
 
 class selection: pass

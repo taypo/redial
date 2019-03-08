@@ -2,7 +2,7 @@ import os
 
 import urwid
 
-from utils import *
+from src.redial.utils import *
 
 
 class MenuButton(urwid.Button):
