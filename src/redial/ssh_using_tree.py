@@ -236,7 +236,7 @@ def construct_tree():
     return root.as_dict()
 
 
-def main():
+def run():
     signal.signal(signal.SIGINT, sigint_handler)
     selection.ssh = ""
     # sample = get_example_tree()
@@ -251,4 +251,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
