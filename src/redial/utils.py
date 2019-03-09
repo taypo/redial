@@ -1,12 +1,11 @@
 from os.path import expanduser
-from hostinfo import *
+
+from .hostinfo import *
 
 
-def getHosts():
+def read_ssh_config():
     home = expanduser("~")
-
     f = open(home + "/.ssh/config")
-
     hosts = []
 
     for f_line in f:
@@ -14,12 +13,14 @@ def getHosts():
         if line.startswith('#'):
             continue
         kv = line.split(' ')
+        h = HostInfo()
         if kv[0].lower() == "host":
-            h = HostInfo()
             h.full_name = kv[1]
             split = kv[1].split('/')
             h.name = split[len(split) - 1]
-            hosts.append(h)
+        elif kv[0].lower() == "hostname":
+            h.ip = kv[1]
+        hosts.append(h)
 
     # root = Folder()
     #
