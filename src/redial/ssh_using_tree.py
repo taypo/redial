@@ -167,13 +167,22 @@ class ExampleTreeBrowser:
         self.topnode = ExampleParentNode(data)
         self.listbox = ExampleTreeListBox(urwid.TreeWalker(self.topnode))
         self.listbox.offset_rows = 1
-        self.header = urwid.Text("")
-        self.footer = urwid.AttrWrap(urwid.Text(self.footer_text),
-                                     'foot')
+        self.header = urwid.Text("Redial")
+        self.footer = self.initFooter()
         self.view = urwid.Frame(
             urwid.AttrWrap(self.listbox, 'body'),
             header=urwid.AttrWrap(self.header, 'head'),
             footer=self.footer)
+
+    def initFooter(self):
+        connectButton = urwid.Button(u"\u23ce Connect")
+        mcButton = urwid.Button("F5 Open MC")
+        copySshKeyButton = urwid.Button("F6 Copy SSH Key")
+        addButton = urwid.Button("F7 Add")
+        deleteButton = urwid.Button("F8 Delete")
+        # TODO make function keys different color
+        # TODO button styling
+        return urwid.GridFlow([connectButton, mcButton, copySshKeyButton, addButton, deleteButton], 20, 1, 0, 'left')
 
     def main(self):
         """Run the program."""
