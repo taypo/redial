@@ -3,7 +3,7 @@ import sys
 
 def main():
     try:
-        from .ssh_using_tree import run
+        from .redial import run
         sys.exit(run())
     except KeyboardInterrupt:
         from . import ExitStatus
