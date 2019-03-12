@@ -9,7 +9,7 @@ from .utils import read_ssh_config
 
 class selection: pass
 
-
+# TODO rename example* class names
 class ExampleTreeWidget(urwid.TreeWidget):
     """ Display widget for leaf nodes """
 
@@ -136,6 +136,11 @@ class ExampleParentNode(urwid.ParentNode):
         return parent
 
 
+def footer_button(label, callback=None, data=None):
+    button = urwid.Button("", callback, data)
+    super(urwid.Button, button).__init__(urwid.SelectableIcon(label))
+    return urwid.AttrWrap(button, 'fbutton')
+
 class ExampleTreeBrowser:
     palette = [
         ('body', 'black', 'light gray'),
@@ -150,17 +155,8 @@ class ExampleTreeBrowser:
         ('dirmark', 'black', 'dark cyan', 'bold'),
         ('flag', 'dark gray', 'light gray'),
         ('error', 'dark red', 'light gray'),
-    ]
-
-    footer_text = [
-        ('title', "SSH Manager"), "    ",
-        ('key', "UP"), ",", ('key', "DOWN"), ",",
-        ('key', "PAGE UP"), ",", ('key', "PAGE DOWN"),
-        "  ",
-        ('key', "+"), ",",
-        ('key', "-"), "  ",
-        ('key', "LEFT"), "  ",
-        ('key', "Q"),
+        ('fbutton', 'dark red', 'light green'),
+        ('selected', 'white', 'dark blue')
     ]
 
     def __init__(self, data=None):
@@ -175,14 +171,14 @@ class ExampleTreeBrowser:
             footer=self.footer)
 
     def initFooter(self):
-        connectButton = urwid.Button(u"\u23ce Connect")
-        mcButton = urwid.Button("F5 Open MC")
-        copySshKeyButton = urwid.Button("F6 Copy SSH Key")
-        addButton = urwid.Button("F7 Add")
-        deleteButton = urwid.Button("F8 Delete")
+        connectButton = footer_button(u"\u23ce Connect")
+        mcButton = footer_button("F5 Open MC")
+        copySshKeyButton = footer_button("F6 Copy SSH Key")
+        addButton = footer_button("F7 Add")
+        deleteButton = footer_button("F8 Delete")
+        quitButton = footer_button("Q Quit")
         # TODO make function keys different color
-        # TODO button styling
-        return urwid.GridFlow([connectButton, mcButton, copySshKeyButton, addButton, deleteButton], 20, 1, 0, 'left')
+        return urwid.GridFlow([connectButton, mcButton, copySshKeyButton, addButton, deleteButton, quitButton], 20, 2, 0, 'left')
 
     def main(self):
         """Run the program."""
