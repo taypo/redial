@@ -2,6 +2,7 @@ import os
 import signal
 
 import urwid
+from redial.ui.footer import FooterButton
 
 from .tree.node import Node
 from .utils import read_ssh_config
@@ -155,8 +156,8 @@ class ExampleTreeBrowser:
         ('dirmark', 'black', 'dark cyan', 'bold'),
         ('flag', 'dark gray', 'light gray'),
         ('error', 'dark red', 'light gray'),
-        ('fbutton', 'dark red', 'light green'),
-        ('selected', 'white', 'dark blue')
+        ('fbutton', 'black', 'dark gray', '', 'g0', '#a8a'),
+        ('fbutton_sc', 'dark red', 'black', 'bold', '#600', '#d86'),
     ]
 
     def __init__(self, data=None):
@@ -171,18 +172,23 @@ class ExampleTreeBrowser:
             footer=self.footer)
 
     def initFooter(self):
-        connectButton = footer_button(u"\u23ce Connect")
-        mcButton = footer_button("F5 Open MC")
-        copySshKeyButton = footer_button("F6 Copy SSH Key")
-        addButton = footer_button("F7 Add")
-        deleteButton = footer_button("F8 Delete")
-        quitButton = footer_button("Q Quit")
-        # TODO make function keys different color
-        return urwid.GridFlow([connectButton, mcButton, copySshKeyButton, addButton, deleteButton, quitButton], 20, 2, 0, 'left')
+        connectButton = FooterButton(u"\u23ce", "Connect")
+        mcButton = FooterButton("F5", "Browse")
+        copySshKeyButton = FooterButton("F6", "Copy SSH Key")
+        addButton = FooterButton("F7", "Add")
+        deleteButton = FooterButton("F8", "Delete")
+        helpButton = FooterButton("F9", "Help")
+        quitButton = FooterButton("Q", "Quit")
+        return urwid.GridFlow([connectButton, mcButton, copySshKeyButton, addButton, deleteButton, helpButton, quitButton], 18, 1, 0, 'center')
 
     def main(self):
         """Run the program."""
-        self.loop = urwid.MainLoop(self.view, self.palette,
+
+        # Set screen to 256 color mode
+        screen = urwid.raw_display.Screen()
+        screen.set_terminal_properties(256)
+
+        self.loop = urwid.MainLoop(self.view, self.palette, screen,
                                    unhandled_input=self.unhandled_input)
         self.loop.run()
 
