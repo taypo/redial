@@ -4,8 +4,8 @@ import signal
 import urwid
 from redial.ui.footer import FooterButton
 
-from .tree.node import Node
-from .utils import read_ssh_config
+from redial.tree.node import Node
+from redial.utils import read_ssh_config
 
 
 class selection: pass
