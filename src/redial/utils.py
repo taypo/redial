@@ -1,6 +1,6 @@
 from os.path import expanduser
 
-from redial.hostinfo import *
+from hostinfo import *
 
 import os
 
@@ -32,9 +32,12 @@ def read_ssh_config():
 
 
 def append_to_config(answers):
-    content = "\nHost " + answers[0] + "\n" + "hostname " + answers[1] + "\n" + "user " + answers[2] + "\n" + "port " + answers[3] + "\n\n"
-              
-    home = expanduser("~")
-    path = home + "/.ssh/config"
-    with open(path, "a+") as file:
-        file.write(content)
+    if len(answers) == 4:
+        content = "\nHost " + answers[0] + "\n" + "hostname " + answers[1] + "\n" + "user " + answers[2] + "\n" + "port " + answers[3] + "\n\n"
+                
+        home = expanduser("~")
+        path = home + "/.ssh/config"
+        with open(path, "a+") as file:
+            file.write(content)
+    else:
+        print("Connection is not saved!")

@@ -1,10 +1,19 @@
 import urwid
+import signal
 
 from utils import append_to_config
 
 
 def question(content):
     return urwid.Pile([urwid.Edit(('I say', content + " "))])
+
+
+def sigint_handler(signum, frame):
+    exit_program()
+
+
+def exit_program():
+    raise urwid.ExitMainLoop()
 
 
 class ConversationListBox(urwid.ListBox):
@@ -29,11 +38,17 @@ class ConversationListBox(urwid.ListBox):
         else:
             raise urwid.ExitMainLoop()
         
-
 palette = [('I say', 'default,bold', 'default'), ]
 questions = ["Host: ", "hostname(ip): ", "user: ", "port: "]
-conversation = ConversationListBox(questions)
-urwid.MainLoop(conversation, palette).run()
 
 
-append_to_config(conversation.answers)
+def init_dialog():
+    conversation = ConversationListBox(questions)
+    urwid.MainLoop(conversation, palette).run()
+    append_to_config(conversation.answers)
+    urwid.ExitMainLoop()
+
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, sigint_handler)
+    init_dialog()
