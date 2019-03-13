@@ -1,7 +1,7 @@
 import urwid
 import signal
 
-from utils import append_to_config
+from redial.utils import append_to_config
 
 
 def question(content):

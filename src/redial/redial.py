@@ -2,11 +2,11 @@ import os
 import signal
 
 import urwid
-from ui.footer import FooterButton
+from redial.ui.footer import FooterButton
 
-from tree.node import Node
-from utils import read_ssh_config
-from dialog import init_dialog
+from redial.tree.node import Node
+from redial.utils import read_ssh_config
+from redial.dialog import init_dialog
 
 
 class selection: pass
