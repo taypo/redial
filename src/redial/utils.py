@@ -1,6 +1,6 @@
 from os.path import expanduser
 
-from .hostinfo import *
+from redial.hostinfo import *
 
 import os
 
