@@ -6,6 +6,7 @@ from redial.ui.footer import FooterButton
 
 from redial.tree.node import Node
 from redial.utils import read_ssh_config
+from redial.dialog import init_dialog
 
 
 class selection: pass
@@ -30,10 +31,16 @@ class ExampleTreeWidget(urwid.TreeWidget):
     def keypress(self, size, key):
         """allow subclasses to intercept keystrokes"""
         key = self.__super.keypress(size, key)
+        selection.key = ""
 
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
             self.update_expanded_icon()
+        elif key == "f7":
+            selection.key = "f7"
+            init_dialog()
+            exit_program()
+            
 
         if key:
             key = self.unhandled_keys(size, key)
@@ -205,27 +212,6 @@ def exit_program():
     raise urwid.ExitMainLoop()
 
 
-def get_example_tree():
-    path1 = "sub1/grandsub1/file1"
-    path2 = "sub2/grandsub1/file1"
-    path3 = "sub2/grandsub1/file2"
-    path4 = "sub3/grandsub1/file1"
-    path5 = "sub3/grandsub2/file1"
-
-    paths = [path1, path2, path3, path4, path5]
-
-    root = Node('parent')
-
-    for path in paths:
-        parts = path.split("/")
-        prev_part = root
-        for part in parts:
-            part = prev_part.child(part)
-            prev_part = part
-
-    return root.as_dict()
-
-
 def construct_tree():
     hosts = read_ssh_config()
 
@@ -250,11 +236,14 @@ def construct_tree():
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
     selection.ssh = ""
-    # sample = get_example_tree()
+    selection.key = ""
     hosts = construct_tree()
     ExampleTreeBrowser(hosts).main()
 
     os.system("clear")
+
+    if selection.key == "f7":
+        run()
 
     if selection.ssh != "":
         print("ssh " + selection.ssh)
