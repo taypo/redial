@@ -242,13 +242,12 @@ def run():
 
     os.system("clear")
 
-    if selection.key == "f7":
-        run()
-
     if selection.ssh != "":
         print("ssh " + selection.ssh)
         os.system("ssh " + selection.ssh)
 
+    if selection.key == "f7":
+        run()
 
 if __name__ == "__main__":
     run()
