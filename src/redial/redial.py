@@ -186,7 +186,13 @@ class ExampleTreeBrowser:
         deleteButton = FooterButton("F8", "Delete")
         helpButton = FooterButton("F9", "Help")
         quitButton = FooterButton("Q", "Quit")
-        return urwid.GridFlow([connectButton, mcButton, copySshKeyButton, addButton, deleteButton, helpButton, quitButton], 18, 1, 0, 'center')
+        return urwid.GridFlow([connectButton,
+                               #mcButton, TODO not implemented
+                               #copySshKeyButton,
+                               addButton,
+                               #deleteButton,
+                               #helpButton,
+                               quitButton], 18, 1, 0, 'center')
 
     def main(self):
         """Run the program."""
