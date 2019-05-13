@@ -4,12 +4,15 @@ import signal
 import urwid
 
 from redial.ui.footer import FooterButton
+from redial.ui.dialog import add_host_dialog
 from redial.tree.node import Node
 from redial.utils import read_ssh_config
-from redial.dialog import init_dialog
 
 
-class selection: pass
+class selection:
+    def reset_layout(self):
+        selection.loop.widget = selection.body
+        selection.loop.draw_screen()
 
 
 # TODO rename example* class names
@@ -41,22 +44,14 @@ class ExampleTreeWidget(urwid.TreeWidget):
             hostinfo = self.get_node().get_value().hostinfo
             # TODO move to util. username might be empty, other settings port etc.
             close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":/home/" + hostinfo.username)
-        # TODO rewrite this to not exit main loop
         elif key == "f7":
-            selection.key = "f7"
-            init_dialog()
-            close_ui_and_run("")
-            
+            add_host_dialog(selection)
 
         if key:
             key = self.unhandled_keys(size, key)
         return key
 
     def unhandled_keys(self, size, key):
-        """
-        Override this method to intercept keystrokes in subclasses.
-        Default behavior: Toggle flagged on space, ignore other keys.
-        """
         if key == "enter":
             if isinstance(self.get_node(), ExampleNode):
                 hostname = self.create_host_name_from_tree_path()
@@ -210,6 +205,8 @@ class ExampleTreeBrowser:
 
         self.loop = urwid.MainLoop(self.view, self.palette, screen,
                                    unhandled_input=self.unhandled_input)
+        selection.loop = self.loop
+        selection.body = self.view
         self.loop.run()
 
     def unhandled_input(self, k):
