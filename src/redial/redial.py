@@ -39,7 +39,8 @@ class ExampleTreeWidget(urwid.TreeWidget):
             self.update_expanded_icon()
         elif key == "f5" and self.is_leaf:
             hostinfo = self.get_node().get_value().hostinfo
-            close_ui_and_run("mc . sh://" + hostinfo.ip + ":/home/" + hostinfo.username)
+            # TODO move to util. username might be empty, other settings port etc.
+            close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":/home/" + hostinfo.username)
         # TODO rewrite this to not exit main loop
         elif key == "f7":
             selection.key = "f7"
