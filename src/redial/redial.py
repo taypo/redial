@@ -151,7 +151,7 @@ def footer_button(label, callback=None, data=None):
     return urwid.AttrWrap(button, 'fbutton')
 
 
-class ExampleTreeBrowser:
+class RedialApplication:
     palette = [
         ('body', 'black', 'light gray'),
         ('flagged', 'black', 'dark green', ('bold', 'underline')),
@@ -258,7 +258,7 @@ def run():
         hosts = construct_tree()
 
         # run UI
-        ExampleTreeBrowser(hosts).main()
+        RedialApplication(hosts).main()
 
         # exit or call other program
         os.system("clear")
