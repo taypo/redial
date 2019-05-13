@@ -4,7 +4,7 @@ from redial.utils import append_to_config
 
 def add_host_dialog(parent):
     # Header
-    header_text = urwid.Text(('banner', 'Help'), align='center')
+    header_text = urwid.Text(('banner', 'Add Connection'), align='center')
     header = urwid.AttrMap(header_text, 'banner')
 
     # Body
@@ -18,7 +18,7 @@ def add_host_dialog(parent):
     body = urwid.LineBox(body_padding)
 
     # Footer
-    footer = urwid.Button('Okay', parent.reset_layout)
+    footer = urwid.Button('Save', parent.reset_layout)
     footer = urwid.AttrWrap(footer, 'selectable', 'focus')
     footer = urwid.GridFlow([footer], 8, 1, 1, 'center')
 

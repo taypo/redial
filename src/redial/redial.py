@@ -197,8 +197,6 @@ class RedialApplication:
                                quitButton], 18, 1, 0, 'center')
 
     def main(self):
-        """Run the program."""
-
         # Set screen to 256 color mode
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
@@ -266,10 +264,6 @@ def run():
             break
 
         os.system(selection.command)
-
-    # TODO add host should not exit main loop
-    # if selection.key == "f7":
-    #    run()
 
 
 if __name__ == "__main__":
