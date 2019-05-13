@@ -12,18 +12,33 @@ def read_ssh_config():
         os.makedirs(directory)
     if os.path.isfile(directory + "config"):
         with open(directory + "config", "r") as file:
+            host_info = None
             for f_line in file:
                 line = f_line.strip()
-                if line.startswith('#'):
+                if line.startswith('#') or not line:
                     continue
                 kv = line.split(' ')
-                h = HostInfo()
-                if kv[0].lower() == "host":
-                    h.full_name = kv[1]
-                    split = kv[1].split('/')
-                    h.name = split[len(split) - 1]
-                    hosts.append(h)
                 
+                key = kv[0].lower()
+                value = kv[1]
+
+                if key == "host":
+                    if(host_info) is not None:
+                        hosts.append(host_info)
+                    
+                    host_info = HostInfo(value)
+                    #split = value.split('/')
+                    #h.name = split[len(split) - 1]
+                if key == "hostname":
+                    host_info.ip = value
+                if key == "user":
+                    host_info.username = value
+                if key == "port":
+                    host_info.port = value
+            
+            if(host_info is not None):
+                hosts.append(host_info)
+
     else:
         file = open(directory + "config", "w")
         file.close()

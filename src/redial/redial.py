@@ -2,14 +2,15 @@ import os
 import signal
 
 import urwid
-from redial.ui.footer import FooterButton
 
+from redial.ui.footer import FooterButton
 from redial.tree.node import Node
 from redial.utils import read_ssh_config
 from redial.dialog import init_dialog
 
 
 class selection: pass
+
 
 # TODO rename example* class names
 class ExampleTreeWidget(urwid.TreeWidget):
@@ -23,7 +24,7 @@ class ExampleTreeWidget(urwid.TreeWidget):
         self.update_w()
 
     def get_display_text(self):
-        return self.get_node().get_value()['name']
+        return self.get_node().get_value().name
 
     def selectable(self):
         return True
@@ -36,10 +37,15 @@ class ExampleTreeWidget(urwid.TreeWidget):
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
             self.update_expanded_icon()
+        elif key == "f5" and self.is_leaf:
+            hostinfo = self.get_node().get_value().hostinfo
+            # TODO move to util. username might be empty, other settings port etc.
+            close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":/home/" + hostinfo.username)
+        # TODO rewrite this to not exit main loop
         elif key == "f7":
             selection.key = "f7"
             init_dialog()
-            exit_program()
+            close_ui_and_run("")
             
 
         if key:
@@ -53,20 +59,20 @@ class ExampleTreeWidget(urwid.TreeWidget):
         """
         if key == "enter":
             if isinstance(self.get_node(), ExampleNode):
-                host_name = self.create_host_name_from_tree_path()
-                selection.ssh = host_name
-                exit_program()
+                hostname = self.create_host_name_from_tree_path()
+                close_ui_and_run("ssh " + hostname)
 
             self.flagged = not self.flagged
             self.update_w()
         else:
             return key
 
+    # TODO should not be needed. refactor
     def create_host_name_from_tree_path(self):
         host_parts = []
         parent = self.get_node().get_parent()
         while parent is not None:
-            parent_name = parent.get_value()['name']
+            parent_name = parent.get_value().name
             host_parts.append(parent_name)
             parent = parent.get_parent()
 
@@ -98,7 +104,7 @@ class ExampleTreeListBox(urwid.TreeListBox):
             if pos == parent_pos and size[1] > 2:
                 self.move_focus_to_parent(size)
         elif key in ('q', 'Q'):
-            exit_program()
+            close_ui_and_exit()
 
         else:
             self.__super.keypress(size, key)
@@ -125,13 +131,13 @@ class ExampleParentNode(urwid.ParentNode):
 
     def load_child_keys(self):
         data = self.get_value()
-        return range(len(data['children']))
+        return range(len(data.children))
 
     def load_child_node(self, key):
         """Return either an ExampleNode or ExampleParentNode"""
-        childdata = self.get_value()['children'][key]
+        childdata = self.get_value().children[key]
         childdepth = self.get_depth() + 1
-        if 'children' in childdata:
+        if 'folder' in childdata.nodetype:
             childclass = ExampleParentNode
         else:
             childclass = ExampleNode
@@ -148,6 +154,7 @@ def footer_button(label, callback=None, data=None):
     button = urwid.Button("", callback, data)
     super(urwid.Button, button).__init__(urwid.SelectableIcon(label))
     return urwid.AttrWrap(button, 'fbutton')
+
 
 class ExampleTreeBrowser:
     palette = [
@@ -187,7 +194,7 @@ class ExampleTreeBrowser:
         helpButton = FooterButton("F9", "Help")
         quitButton = FooterButton("Q", "Quit")
         return urwid.GridFlow([connectButton,
-                               #mcButton, TODO not implemented
+                               mcButton,
                                #copySshKeyButton,
                                addButton,
                                #deleteButton,
@@ -211,49 +218,62 @@ class ExampleTreeBrowser:
 
 
 def sigint_handler(signum, frame):
-    exit_program()
+    close_ui_and_exit()
 
 
-def exit_program():
+def close_ui_and_run(command):
+    selection.command = command
+    raise urwid.ExitMainLoop()
+
+
+def close_ui_and_exit():
+    selection.exit = True
     raise urwid.ExitMainLoop()
 
 
 def construct_tree():
     hosts = read_ssh_config()
-
-    configs = [host.full_name for host in hosts]
-
     root = Node('.')
 
-    for config in configs:
+    for host in hosts:
         prev_part = root
-        parts = config.split("/")
+        parts = host.full_name.split("/")
         for part_idx in range(len(parts)):
             if part_idx == len(parts) - 1:
-                part = prev_part.child(parts[part_idx], type="session")
+                part = prev_part.add_child(Node(parts[part_idx], "session", host))
             else:
-                part = prev_part.child(parts[part_idx], type="folder")
+                part = prev_part.add_child(Node(parts[part_idx]))
 
             prev_part = part
 
-    return root.as_dict()
+    return root
 
 
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
-    selection.ssh = ""
-    selection.key = ""
-    hosts = construct_tree()
-    ExampleTreeBrowser(hosts).main()
 
-    os.system("clear")
+    while True:
+        # init selection
+        selection.command = ""
+        selection.exit = False
 
-    if selection.ssh != "":
-        print("ssh " + selection.ssh)
-        os.system("ssh " + selection.ssh)
+        # read configuration
+        hosts = construct_tree()
 
-    if selection.key == "f7":
-        run()
+        # run UI
+        ExampleTreeBrowser(hosts).main()
+
+        # exit or call other program
+        os.system("clear")
+        if selection.exit:
+            break
+
+        os.system(selection.command)
+
+    # TODO add host should not exit main loop
+    # if selection.key == "f7":
+    #    run()
+
 
 if __name__ == "__main__":
     run()

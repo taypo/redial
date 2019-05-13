@@ -1,0 +1,7 @@
+{
+    "python.pythonPath": "venv/bin/python3.6",
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": {"when": "$(basename).py"}
+    }
+}
