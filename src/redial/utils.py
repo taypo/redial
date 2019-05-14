@@ -23,12 +23,10 @@ def read_ssh_config():
                 value = kv[1]
 
                 if key == "host":
-                    if(host_info) is not None:
+                    if host_info is not None:
                         hosts.append(host_info)
                     
                     host_info = HostInfo(value)
-                    #split = value.split('/')
-                    #h.name = split[len(split) - 1]
                 if key == "hostname":
                     host_info.ip = value
                 if key == "user":
@@ -36,7 +34,7 @@ def read_ssh_config():
                 if key == "port":
                     host_info.port = value
             
-            if(host_info is not None):
+            if host_info is not None:
                 hosts.append(host_info)
 
     else:
@@ -46,13 +44,18 @@ def read_ssh_config():
     return hosts
 
 
-def append_to_config(answers):
-    if len(answers) == 4:
-        content = "\nHost " + answers[0] + "\n" + "hostname " + answers[1] + "\n" + "user " + answers[2] + "\n" + "port " + answers[3] + "\n\n"
+def append_to_config(host: HostInfo):
+    content = "\n"
+    if host.full_name:
+        content += "Host " + host.full_name + "\n"
+    if host.ip:
+        content += "    hostname " + host.ip + "\n"
+    if host.port:
+        content += "    port " + host.port + "\n"
+    if host.username:
+        content += "    user " + host.username + "\n"
                 
-        home = expanduser("~")
-        path = home + "/.ssh/config"
-        with open(path, "a+") as file:
-            file.write(content)
-    else:
-        print("Connection is not saved!")
+    home = expanduser("~")
+    path = home + "/.ssh/config"
+    with open(path, "a+") as file:
+        file.write(content)
