@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "venv/bin/python3.6",
+    "python.pythonPath": "venv/bin/python3",
     "files.exclude": {
         "**/__pycache__": true,
         "**/*.pyc": {"when": "$(basename).py"}

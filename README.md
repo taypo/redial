@@ -6,6 +6,6 @@ redial is a simple shell application that manages your SSH sessions.
 
 You can install it with pip.
 
-`pip install redial` 
+`pip3 install redial` 
 
 More features coming soon..
