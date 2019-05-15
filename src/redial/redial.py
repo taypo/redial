@@ -4,12 +4,18 @@ import signal
 import urwid
 
 from redial.ui.footer import FooterButton
+from redial.ui.dialog import AddHostDialog
 from redial.tree.node import Node
 from redial.utils import read_ssh_config
-from redial.dialog import init_dialog
 
 
 class selection: pass
+
+
+def reset_layout():
+    raise urwid.ExitMainLoop()
+    #selection.loop.widget = selection.body
+    #selection.loop.draw_screen()
 
 
 # TODO rename example* class names
@@ -41,22 +47,14 @@ class ExampleTreeWidget(urwid.TreeWidget):
             hostinfo = self.get_node().get_value().hostinfo
             # TODO move to util. username might be empty, other settings port etc.
             close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":/home/" + hostinfo.username)
-        # TODO rewrite this to not exit main loop
         elif key == "f7":
-            selection.key = "f7"
-            init_dialog()
-            close_ui_and_run("")
-            
+            AddHostDialog(selection.loop, reset_layout).show()
 
         if key:
             key = self.unhandled_keys(size, key)
         return key
 
     def unhandled_keys(self, size, key):
-        """
-        Override this method to intercept keystrokes in subclasses.
-        Default behavior: Toggle flagged on space, ignore other keys.
-        """
         if key == "enter":
             if isinstance(self.get_node(), ExampleNode):
                 hostname = self.create_host_name_from_tree_path()
@@ -150,13 +148,7 @@ class ExampleParentNode(urwid.ParentNode):
         return parent
 
 
-def footer_button(label, callback=None, data=None):
-    button = urwid.Button("", callback, data)
-    super(urwid.Button, button).__init__(urwid.SelectableIcon(label))
-    return urwid.AttrWrap(button, 'fbutton')
-
-
-class ExampleTreeBrowser:
+class RedialApplication:
     palette = [
         ('body', 'black', 'light gray'),
         ('flagged', 'black', 'dark green', ('bold', 'underline')),
@@ -195,21 +187,21 @@ class ExampleTreeBrowser:
         quitButton = FooterButton("Q", "Quit")
         return urwid.GridFlow([connectButton,
                                mcButton,
-                               #copySshKeyButton,
+                               # copySshKeyButton,
                                addButton,
-                               #deleteButton,
-                               #helpButton,
+                               # deleteButton,
+                               # helpButton,
                                quitButton], 18, 1, 0, 'center')
 
     def main(self):
-        """Run the program."""
-
         # Set screen to 256 color mode
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
 
         self.loop = urwid.MainLoop(self.view, self.palette, screen,
                                    unhandled_input=self.unhandled_input)
+        selection.loop = self.loop
+        selection.body = self.view
         self.loop.run()
 
     def unhandled_input(self, k):
@@ -261,18 +253,16 @@ def run():
         hosts = construct_tree()
 
         # run UI
-        ExampleTreeBrowser(hosts).main()
+        RedialApplication(hosts).main()
 
         # exit or call other program
         os.system("clear")
         if selection.exit:
             break
 
-        os.system(selection.command)
-
-    # TODO add host should not exit main loop
-    # if selection.key == "f7":
-    #    run()
+        if selection.command:
+            os.system(selection.command)
+            selection.command = ""
 
 
 if __name__ == "__main__":
