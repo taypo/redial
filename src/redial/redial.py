@@ -46,7 +46,7 @@ class ExampleTreeWidget(urwid.TreeWidget):
         elif key == "f5" and self.is_leaf:
             hostinfo = self.get_node().get_value().hostinfo
             # TODO move to util. username might be empty, other settings port etc.
-            close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":/home/" + hostinfo.username)
+            close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":" + hostinfo.port + "/home/" + hostinfo.username)
         elif key == "f7":
             AddHostDialog(selection.loop, reset_layout).show()
 
