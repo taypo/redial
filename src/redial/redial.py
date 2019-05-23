@@ -3,10 +3,10 @@ import signal
 
 import urwid
 
+from redial.config import load_session_config
 from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog
 from redial.tree.node import Node
-from redial.utils import read_ssh_config
 
 
 class selection: pass
@@ -223,24 +223,6 @@ def close_ui_and_exit():
     raise urwid.ExitMainLoop()
 
 
-def construct_tree():
-    hosts = read_ssh_config()
-    root = Node('.')
-
-    for host in hosts:
-        prev_part = root
-        parts = host.full_name.split("/")
-        for part_idx in range(len(parts)):
-            if part_idx == len(parts) - 1:
-                part = prev_part.add_child(Node(parts[part_idx], "session", host))
-            else:
-                part = prev_part.add_child(Node(parts[part_idx]))
-
-            prev_part = part
-
-    return root
-
-
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
 
@@ -250,7 +232,7 @@ def run():
         selection.exit = False
 
         # read configuration
-        hosts = construct_tree()
+        hosts = load_session_config()
 
         # run UI
         RedialApplication(hosts).main()

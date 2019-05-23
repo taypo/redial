@@ -21,8 +21,6 @@ class AddHostDialog:
         header_text = urwid.Text(('banner', 'Add Connection'), align='center')
         header = urwid.AttrMap(header_text, 'banner')
 
-
-
         # Footer
         save_btn = urwid.Button('Save', self.on_save)
         save_btn = urwid.AttrWrap(save_btn, 'selectable', 'focus')
