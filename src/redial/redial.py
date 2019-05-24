@@ -3,7 +3,7 @@ import signal
 
 import urwid
 
-from redial.config import load_session_config
+from redial.config import Config
 from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog
 
@@ -230,10 +230,11 @@ def run():
         State.exit = False
 
         # read configuration
-        hosts = load_session_config()
+        State.config = Config()
+        sessions = State.config.get_sessions()
 
         # run UI
-        RedialApplication(hosts).main()
+        RedialApplication(sessions).main()
 
         # exit or call other program
         os.system("clear")

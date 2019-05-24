@@ -3,83 +3,93 @@ from redial.tree.node import Node
 import os
 
 
-def load_session_config() -> Node:
-    hosts = []
-    with open(__get_or_create_config_file(), "r") as file:
-        host_info = None
-        for f_line in file:
-            line = f_line.strip()
-            if line.startswith('#') or not line:
-                continue
-            kv = line.split(' ')
+class Config:
+    def __init__(self):
+        self.sessions = Node(".")
+        self.load_from_file()
 
-            key = kv[0].lower()
-            value = kv[1]
+    def load_from_file(self):
+        hosts = []
+        with open(self.__get_or_create_config_file(), "r") as file:
+            host_info = None
+            for f_line in file:
+                line = f_line.strip()
+                if line.startswith('#') or not line:
+                    continue
+                kv = line.split(' ')
 
-            if key == "host":
-                if host_info is not None:
-                    hosts.append(host_info)
+                key = kv[0].lower()
+                value = kv[1]
 
-                host_info = HostInfo(value)
-            if key == "hostname":
-                host_info.ip = value
-            if key == "user":
-                host_info.username = value
-            if key == "port":
-                host_info.port = value
+                if key == "host":
+                    if host_info is not None:
+                        hosts.append(host_info)
 
-        if host_info is not None:
-            hosts.append(host_info)
+                    host_info = HostInfo(value)
+                if key == "hostname":
+                    host_info.ip = value
+                if key == "user":
+                    host_info.username = value
+                if key == "port":
+                    host_info.port = value
 
-    return __construct_tree(hosts)
+            if host_info is not None:
+                hosts.append(host_info)
 
+        self.sessions = self.__construct_tree(hosts)
 
-def save_session_config(sessions: Node):
-    with open(__get_or_create_config_file(), "w") as file:
-        __append_node_to_file(sessions, file)
+    def save_to_file(self):
+        with open(self.__get_or_create_config_file(), "w") as file:
+            self.__append_node_to_file(self.sessions, file)
 
+    def get_sessions(self) -> Node:
+        return self.sessions
 
-# Private Methods
-__CONFIG_PATH = ".ssh/"
-__CONFIG_FILE = "config"
+    def add_node(self, parent: Node, node: Node):
+        pass
 
+    def delete_node(self, node: Node):
+        pass
 
-def __get_or_create_config_file() -> str:
-    home = os.path.expanduser("~")
-    directory = home + "/" + __CONFIG_PATH
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    full_path = directory + __CONFIG_FILE
-    if not os.path.isfile(full_path):
-        file = open(full_path, "w")
-        file.close()
-    return full_path
+    # Private Methods
+    __CONFIG_PATH = ".ssh/"
+    __CONFIG_FILE = "config"
 
+    def __get_or_create_config_file(self) -> str:
+        home = os.path.expanduser("~")
+        directory = home + "/" + self.__CONFIG_PATH
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        full_path = directory + self.__CONFIG_FILE
+        if not os.path.isfile(full_path):
+            file = open(full_path, "w")
+            file.close()
+        return full_path
 
-def __append_node_to_file(node: Node, file):
-    if node.nodetype == "folder":
-        for child in node.children:
-            __append_node_to_file(child, file)
-    else:
-        file.write("Host " + node.hostinfo.full_name + "\n")
-        file.write("\thostname " + node.hostinfo.ip + "\n")
-        file.write("\tuser " + node.hostinfo.username + "\n")
-        file.write("\tport " + node.hostinfo.port + "\n")
-        file.write("\n")
+    def __append_node_to_file(self, node: Node, file):
+        if node.nodetype == "folder":
+            for child in node.children:
+                self.__append_node_to_file(child, file)
+        else:
+            file.write("Host " + node.hostinfo.full_name + "\n")
+            file.write("\thostname " + node.hostinfo.ip + "\n")
+            file.write("\tuser " + node.hostinfo.username + "\n")
+            file.write("\tport " + node.hostinfo.port + "\n")
+            file.write("\n")
 
+    def __construct_tree(self, hosts):
+        root = Node('.')
 
-def __construct_tree(hosts):
-    root = Node('.')
+        for host in hosts:
+            prev_part = root
+            parts = host.full_name.split("/")
+            for part_idx in range(len(parts)):
+                if part_idx == len(parts) - 1:
+                    part = prev_part.add_child(Node(parts[part_idx], "session", host))
+                else:
+                    part = prev_part.add_child(Node(parts[part_idx]))
 
-    for host in hosts:
-        prev_part = root
-        parts = host.full_name.split("/")
-        for part_idx in range(len(parts)):
-            if part_idx == len(parts) - 1:
-                part = prev_part.add_child(Node(parts[part_idx], "session", host))
-            else:
-                part = prev_part.add_child(Node(parts[part_idx]))
+                prev_part = part
 
-            prev_part = part
+        return root
 
-    return root
