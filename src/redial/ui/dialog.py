@@ -1,6 +1,5 @@
 import urwid
 
-from redial.utils import append_to_config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
 
