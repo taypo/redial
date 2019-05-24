@@ -6,7 +6,7 @@ import urwid
 from redial.config import Config
 from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog
-
+from redial.ui.palette import palette
 
 # TODO get rid of this if possible
 class State: pass
@@ -147,22 +147,6 @@ class UIParentNode(urwid.ParentNode):
 
 
 class RedialApplication:
-    palette = [
-        ('body', 'black', 'light gray'),
-        ('flagged', 'black', 'dark green', ('bold', 'underline')),
-        ('focus', 'light gray', 'dark blue', 'standout'),
-        ('flagged focus', 'yellow', 'dark cyan',
-         ('bold', 'standout', 'underline')),
-        ('head', 'yellow', 'black', 'standout'),
-        ('foot', 'light gray', 'black'),
-        ('key', 'light cyan', 'black', 'underline'),
-        ('title', 'white', 'black', 'bold'),
-        ('dirmark', 'black', 'dark cyan', 'bold'),
-        ('flag', 'dark gray', 'light gray'),
-        ('error', 'dark red', 'light gray'),
-        ('fbutton', 'black', 'dark gray', '', 'g0', '#a8a'),
-        ('fbutton_sc', 'dark red', 'black', 'bold', '#600', '#d86'),
-    ]
 
     def __init__(self, data=None):
         self.topnode = UIParentNode(data)
@@ -170,6 +154,7 @@ class RedialApplication:
         self.listbox.offset_rows = 1
         self.header = urwid.Text("Redial")
         self.footer = self.initFooter()
+        self.loop = None
         self.view = urwid.Frame(
             urwid.AttrWrap(self.listbox, 'body'),
             header=urwid.AttrWrap(self.header, 'head'),
@@ -196,7 +181,7 @@ class RedialApplication:
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
 
-        self.loop = urwid.MainLoop(self.view, self.palette, screen,
+        self.loop = urwid.MainLoop(self.view, palette, screen,
                                    unhandled_input=self.unhandled_input)
         State.loop = self.loop
         State.body = self.view
