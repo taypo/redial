@@ -5,7 +5,7 @@ import urwid
 
 from redial.config import Config
 from redial.ui.footer import FooterButton
-from redial.ui.dialog import AddHostDialog
+from redial.ui.dialog import AddHostDialog,RemoveHostDialog
 from redial.ui.palette import palette
 
 
@@ -48,6 +48,8 @@ class UITreeWidget(urwid.TreeWidget):
             this_node = self.get_node()
             parent_node = this_node.get_value() if (this_node.get_parent() is None) else this_node.get_parent().get_value()
             AddHostDialog(State, parent_node, reset_layout).show()
+        elif key == "f8":
+            RemoveHostDialog(State, self.get_node().get_value(), reset_layout).show()
         if key:
             key = self.unhandled_keys(size, key)
         return key
@@ -172,7 +174,7 @@ class RedialApplication:
                                mcButton,
                                # copySshKeyButton,
                                addButton,
-                               # deleteButton,
+                               deleteButton,
                                # helpButton,
                                quitButton], 18, 1, 0, 'center')
 
