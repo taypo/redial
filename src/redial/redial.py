@@ -18,8 +18,7 @@ def reset_layout():
     #selection.loop.draw_screen()
 
 
-# TODO rename example* class names
-class ExampleTreeWidget(urwid.TreeWidget):
+class UITreeWidget(urwid.TreeWidget):
     """ Display widget for leaf nodes """
 
     def __init__(self, node):
@@ -56,7 +55,7 @@ class ExampleTreeWidget(urwid.TreeWidget):
 
     def unhandled_keys(self, size, key):
         if key == "enter":
-            if isinstance(self.get_node(), ExampleNode):
+            if isinstance(self.get_node(), UITreeNode):
                 hostname = self.create_host_name_from_tree_path()
                 close_ui_and_run("ssh " + hostname)
 
@@ -91,7 +90,7 @@ class ExampleTreeWidget(urwid.TreeWidget):
             self._w.focus_attr = 'focus'
 
 
-class ExampleTreeListBox(urwid.TreeListBox):
+class UITreeListBox(urwid.TreeListBox):
 
     def keypress(self, size, key):
         if key == "left":
@@ -108,24 +107,24 @@ class ExampleTreeListBox(urwid.TreeListBox):
             self.__super.keypress(size, key)
 
 
-class ExampleNode(urwid.TreeNode):
+class UITreeNode(urwid.TreeNode):
     """ Data storage object for leaf nodes """
 
     def load_widget(self):
-        return ExampleTreeWidget(self)
+        return UITreeWidget(self)
 
     def load_parent(self):
         parentname, myname = os.path.split(self.get_value())
-        parent = ExampleParentNode(parentname)
+        parent = UIParentNode(parentname)
         parent.set_child_node(self.get_key(), self)
         return parent
 
 
-class ExampleParentNode(urwid.ParentNode):
+class UIParentNode(urwid.ParentNode):
     """ Data storage object for interior/parent nodes """
 
     def load_widget(self):
-        return ExampleTreeWidget(self)
+        return UITreeWidget(self)
 
     def load_child_keys(self):
         data = self.get_value()
@@ -136,14 +135,14 @@ class ExampleParentNode(urwid.ParentNode):
         childdata = self.get_value().children[key]
         childdepth = self.get_depth() + 1
         if 'folder' in childdata.nodetype:
-            childclass = ExampleParentNode
+            childclass = UIParentNode
         else:
-            childclass = ExampleNode
+            childclass = UITreeNode
         return childclass(childdata, parent=self, key=key, depth=childdepth)
 
     def load_parent(self):
         parentname, myname = os.path.split(self.get_value())
-        parent = ExampleParentNode(parentname)
+        parent = UIParentNode(parentname)
         parent.set_child_node(self.get_key(), self)
         return parent
 
@@ -167,8 +166,8 @@ class RedialApplication:
     ]
 
     def __init__(self, data=None):
-        self.topnode = ExampleParentNode(data)
-        self.listbox = ExampleTreeListBox(urwid.TreeWalker(self.topnode))
+        self.topnode = UIParentNode(data)
+        self.listbox = UITreeListBox(urwid.TreeWalker(self.topnode))
         self.listbox.offset_rows = 1
         self.header = urwid.Text("Redial")
         self.footer = self.initFooter()
