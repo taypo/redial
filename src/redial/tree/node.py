@@ -3,8 +3,10 @@ from redial.hostinfo import HostInfo
 
 class Node(object):
     def __init__(self, name, nodetype="folder", hostinfo: HostInfo = None):
+        # TODO remove name
         self.name = name
         self.children = []
+        # TODO refactor nodetype
         self.nodetype = nodetype
         self.hostinfo = hostinfo
 

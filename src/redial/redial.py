@@ -8,14 +8,13 @@ from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog
 from redial.ui.palette import palette
 
+
 # TODO get rid of this if possible
 class State: pass
 
 
 def reset_layout():
     raise urwid.ExitMainLoop()
-    #selection.loop.widget = selection.body
-    #selection.loop.draw_screen()
 
 
 class UITreeWidget(urwid.TreeWidget):
@@ -46,8 +45,9 @@ class UITreeWidget(urwid.TreeWidget):
             # TODO move to util. username might be empty, other settings port etc.
             close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":" + hostinfo.port + "/home/" + hostinfo.username)
         elif key == "f7":
-            AddHostDialog(State.loop, reset_layout).show()
-
+            this_node = self.get_node()
+            parent_node = this_node.get_value() if (this_node.get_parent() is None) else this_node.get_parent().get_value()
+            AddHostDialog(State, parent_node, reset_layout).show()
         if key:
             key = self.unhandled_keys(size, key)
         return key

@@ -2,12 +2,15 @@ import urwid
 
 from redial.utils import append_to_config
 from redial.hostinfo import HostInfo
+from redial.tree.node import Node
 
 
 class AddHostDialog:
 
-    def __init__(self, loop: urwid.MainLoop, on_close):
-        self.loop = loop
+    def __init__(self, state, parent: Node, on_close):
+        self.loop = state.loop
+        self.config = state.config
+        self.parent = parent
         self.on_close = on_close
 
         # Form Fields
@@ -56,7 +59,9 @@ class AddHostDialog:
         host_info.ip = self.ip.edit_text
         host_info.port = self.port.edit_text
         host_info.username = self.username.edit_text
-        append_to_config(host_info)
+
+        node = Node(self.connection_name.edit_text, "session", host_info)
+        self.config.add_node(self.parent, node)
 
         self.on_close()
 

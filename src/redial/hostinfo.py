@@ -1,5 +1,6 @@
 
 class HostInfo():
+    # TODO rename to name
     full_name = ""
     ip = ""
     port = ""

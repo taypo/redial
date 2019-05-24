@@ -40,13 +40,14 @@ class Config:
 
     def save_to_file(self):
         with open(self.__get_or_create_config_file(), "w") as file:
-            self.__append_node_to_file(self.sessions, file)
+            self.__append_node_to_file(self.sessions, "", file)
 
     def get_sessions(self) -> Node:
         return self.sessions
 
     def add_node(self, parent: Node, node: Node):
-        pass
+        parent.add_child(node)
+        self.save_to_file()
 
     def delete_node(self, node: Node):
         pass
@@ -66,12 +67,15 @@ class Config:
             file.close()
         return full_path
 
-    def __append_node_to_file(self, node: Node, file):
+    def __append_node_to_file(self, node: Node, path: str, file):
+        path = path.lstrip("/")
         if node.nodetype == "folder":
             for child in node.children:
-                self.__append_node_to_file(child, file)
+                sub_path = path + "/" + node.name if (node.name != ".") else ""
+                self.__append_node_to_file(child, sub_path, file)
         else:
-            file.write("Host " + node.hostinfo.full_name + "\n")
+            session_name = (path + "/" + node.name).lstrip("/")
+            file.write("Host " + session_name + "\n")
             file.write("\thostname " + node.hostinfo.ip + "\n")
             file.write("\tuser " + node.hostinfo.username + "\n")
             file.write("\tport " + node.hostinfo.port + "\n")
