@@ -6,10 +6,10 @@ import urwid
 from redial.config import load_session_config
 from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog
-from redial.tree.node import Node
 
 
-class selection: pass
+# TODO get rid of this if possible
+class State: pass
 
 
 def reset_layout():
@@ -37,7 +37,6 @@ class UITreeWidget(urwid.TreeWidget):
     def keypress(self, size, key):
         """allow subclasses to intercept keystrokes"""
         key = self.__super.keypress(size, key)
-        selection.key = ""
 
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
@@ -47,7 +46,7 @@ class UITreeWidget(urwid.TreeWidget):
             # TODO move to util. username might be empty, other settings port etc.
             close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":" + hostinfo.port + "/home/" + hostinfo.username)
         elif key == "f7":
-            AddHostDialog(selection.loop, reset_layout).show()
+            AddHostDialog(State.loop, reset_layout).show()
 
         if key:
             key = self.unhandled_keys(size, key)
@@ -199,8 +198,8 @@ class RedialApplication:
 
         self.loop = urwid.MainLoop(self.view, self.palette, screen,
                                    unhandled_input=self.unhandled_input)
-        selection.loop = self.loop
-        selection.body = self.view
+        State.loop = self.loop
+        State.body = self.view
         self.loop.run()
 
     def unhandled_input(self, k):
@@ -213,12 +212,12 @@ def sigint_handler(signum, frame):
 
 
 def close_ui_and_run(command):
-    selection.command = command
+    State.command = command
     raise urwid.ExitMainLoop()
 
 
 def close_ui_and_exit():
-    selection.exit = True
+    State.exit = True
     raise urwid.ExitMainLoop()
 
 
@@ -227,8 +226,8 @@ def run():
 
     while True:
         # init selection
-        selection.command = ""
-        selection.exit = False
+        State.command = ""
+        State.exit = False
 
         # read configuration
         hosts = load_session_config()
@@ -238,12 +237,12 @@ def run():
 
         # exit or call other program
         os.system("clear")
-        if selection.exit:
+        if State.exit:
             break
 
-        if selection.command:
-            os.system(selection.command)
-            selection.command = ""
+        if State.command:
+            os.system(State.command)
+            State.command = ""
 
 
 if __name__ == "__main__":
