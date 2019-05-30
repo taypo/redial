@@ -64,7 +64,9 @@ class UITreeWidget(urwid.TreeWidget):
                 MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
             else:
                 RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
-
+        # TODO implement edit
+        # elif key == "f9":
+        #    AddHostDialog(State, parent_node, reset_layout).show()
         return key
 
     # TODO do we need this?
@@ -156,13 +158,15 @@ class RedialApplication:
         copySshKeyButton = FooterButton("F6", "Copy SSH Key")
         addButton = FooterButton("F7", "Add")
         deleteButton = FooterButton("F8", "Remove")
-        helpButton = FooterButton("F9", "Help")
+        editButton = FooterButton("F9", "Edit")
+        helpButton = FooterButton("F1", "Help")
         quitButton = FooterButton("Q", "Quit")
         return urwid.GridFlow([connectButton,
                                mcButton,
                                # copySshKeyButton,
                                addButton,
                                deleteButton,
+                               # editButton,
                                # helpButton,
                                quitButton], 18, 1, 0, 'center')
 
