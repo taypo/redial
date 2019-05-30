@@ -67,17 +67,19 @@ class AddHostDialog:
     def on_cancel(self, args):
         self.on_close()
 
+
 class RemoveHostDialog:
 
-    def __init__(self, state, node: Node, on_close):
+    def __init__(self, state, parent: Node, node: Node, on_close):
         self.loop = state.loop
         self.config = state.config
+        self.parent = parent
         self.node = node
         self.on_close = on_close
 
     def show(self):
         # Header
-        header_text = urwid.Text(('banner', 'Remove Connection'), align='center')
+        header_text = urwid.Text(('banner', 'Remove Connection: ' + self.node.name), align='center')
         header = urwid.AttrMap(header_text, 'banner')
 
         # Footer
@@ -115,7 +117,56 @@ class RemoveHostDialog:
         self.loop.widget = w
 
     def on_ok(self, args):
+        self.config.delete_node(self.parent, self.node)
         self.on_close()
 
     def on_cancel(self, args):
+        self.on_close()
+
+
+class MessageDialog:
+
+    def __init__(self, state, title, message, on_close):
+        self.loop = state.loop
+        self.title = title
+        self.message = message
+        self.on_close = on_close
+
+    def show(self):
+        # Header
+        header_text = urwid.Text(('banner', self.title), align='center')
+        header = urwid.AttrMap(header_text, 'banner')
+
+        # Footer
+        ok_btn = urwid.Button('Ok', self.on_ok)
+        ok_btn = urwid.AttrWrap(ok_btn, 'selectable', 'focus')
+
+        footer = urwid.GridFlow([ok_btn], 12, 1, 1, 'center')
+
+        body = urwid.Filler(
+            urwid.Pile([
+                urwid.Text(self.message),
+                urwid.Text(""),
+                footer
+            ])
+        )
+
+        # Layout
+        layout = urwid.Frame(
+            body,
+            header=header
+        )
+
+        w = urwid.Overlay(
+            urwid.LineBox(layout),
+            self.loop.widget,
+            align='center',
+            width=40,
+            valign='middle',
+            height=10
+        )
+
+        self.loop.widget = w
+
+    def on_ok(self, args):
         self.on_close()

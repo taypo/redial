@@ -49,8 +49,9 @@ class Config:
         parent.add_child(node)
         self.save_to_file()
 
-    def delete_node(self, node: Node):
-        pass
+    def delete_node(self, parent: Node, node: Node):
+        parent.remove_child(node)
+        self.save_to_file()
 
     # Private Methods
     __CONFIG_PATH = ".ssh/"

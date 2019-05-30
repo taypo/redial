@@ -5,7 +5,7 @@ import urwid
 
 from redial.config import Config
 from redial.ui.footer import FooterButton
-from redial.ui.dialog import AddHostDialog,RemoveHostDialog
+from redial.ui.dialog import AddHostDialog,RemoveHostDialog,MessageDialog
 from redial.ui.palette import palette
 
 
@@ -37,19 +37,25 @@ class UITreeWidget(urwid.TreeWidget):
         """allow subclasses to intercept keystrokes"""
         key = self.__super.keypress(size, key)
 
+        this_node = self.get_node().get_value()
+        parent_node = self.get_node().get_value() if (self.get_node().get_parent() is None) \
+            else self.get_node().get_parent().get_value()
+
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
             self.update_expanded_icon()
         elif key == "f5" and self.is_leaf:
-            hostinfo = self.get_node().get_value().hostinfo
+            hostinfo = this_node.hostinfo
             # TODO move to util. username might be empty, other settings port etc.
             close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":" + hostinfo.port + "/home/" + hostinfo.username)
         elif key == "f7":
-            this_node = self.get_node()
-            parent_node = this_node.get_value() if (this_node.get_parent() is None) else this_node.get_parent().get_value()
             AddHostDialog(State, parent_node, reset_layout).show()
         elif key == "f8":
-            RemoveHostDialog(State, self.get_node().get_value(), reset_layout).show()
+            if this_node.nodetype == "folder":
+                # TODO implement removing folder
+                MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
+            else:
+                RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
         if key:
             key = self.unhandled_keys(size, key)
         return key
@@ -167,7 +173,7 @@ class RedialApplication:
         mcButton = FooterButton("F5", "Browse")
         copySshKeyButton = FooterButton("F6", "Copy SSH Key")
         addButton = FooterButton("F7", "Add")
-        deleteButton = FooterButton("F8", "Delete")
+        deleteButton = FooterButton("F8", "Remove")
         helpButton = FooterButton("F9", "Help")
         quitButton = FooterButton("Q", "Quit")
         return urwid.GridFlow([connectButton,

@@ -17,3 +17,9 @@ class Node(object):
         else:
             self.children.append(node)
             return node
+
+    def remove_child(self, node: 'Node'):
+        child_found = [c for c in self.children if c == node]
+        if child_found:
+            self.children.remove(child_found[0])
+
