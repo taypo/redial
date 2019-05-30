@@ -25,3 +25,15 @@ class HostInfo:
 
         return c
 
+    def get_ssh_command(self):
+        c = "ssh "
+
+        if self.username:
+            c = c + self.username + "@"
+
+        c = c + self.ip
+
+        if self.port:
+            c = c + " -p " + self.port
+
+        return c

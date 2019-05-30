@@ -41,6 +41,13 @@ class UITreeWidget(urwid.TreeWidget):
         parent_node = self.get_node().get_value() if (self.get_node().get_parent() is None) \
             else self.get_node().get_parent().get_value()
 
+        if key == "enter":
+            if isinstance(self.get_node(), UITreeNode):
+                close_ui_and_run(this_node.hostinfo.get_ssh_command())
+
+            self.flagged = not self.flagged
+            self.update_w()
+
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
             self.update_expanded_icon()
@@ -58,36 +65,9 @@ class UITreeWidget(urwid.TreeWidget):
             else:
                 RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
 
-        if key:
-            key = self.unhandled_keys(size, key)
         return key
 
-    def unhandled_keys(self, size, key):
-        if key == "enter":
-            if isinstance(self.get_node(), UITreeNode):
-                hostname = self.create_host_name_from_tree_path()
-                close_ui_and_run("ssh " + hostname)
-
-            self.flagged = not self.flagged
-            self.update_w()
-        else:
-            return key
-
-    # TODO should not be needed. refactor
-    def create_host_name_from_tree_path(self):
-        host_parts = []
-        parent = self.get_node().get_parent()
-        while parent is not None:
-            parent_name = parent.get_value().name
-            host_parts.append(parent_name)
-            parent = parent.get_parent()
-
-        host_name = self.get_display_text()
-        for part in host_parts:
-            host_name = part + "/" + host_name
-
-        return host_name.replace("./", "")
-
+    # TODO do we need this?
     def update_w(self):
         """Update the attributes of self.widget based on self.flagged.
         """
