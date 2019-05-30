@@ -67,6 +67,8 @@ class UITreeWidget(urwid.TreeWidget):
         # TODO implement edit
         # elif key == "f9":
         #    AddHostDialog(State, parent_node, reset_layout).show()
+        elif key in ('q', 'Q'):
+            close_ui_and_exit()
         return key
 
     # TODO do we need this?
@@ -91,8 +93,6 @@ class UITreeListBox(urwid.TreeListBox):
 
             if pos == parent_pos and size[1] > 2:
                 self.move_focus_to_parent(size)
-        elif key in ('q', 'Q'):
-            close_ui_and_exit()
 
         else:
             self.__super.keypress(size, key)
@@ -175,15 +175,10 @@ class RedialApplication:
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
 
-        self.loop = urwid.MainLoop(self.view, palette, screen,
-                                   unhandled_input=self.unhandled_input)
+        self.loop = urwid.MainLoop(self.view, palette, screen)
         State.loop = self.loop
         State.body = self.view
         self.loop.run()
-
-    def unhandled_input(self, k):
-        if k in ('q', 'Q'):
-            raise urwid.ExitMainLoop()
 
 
 def sigint_handler(signum, frame):
