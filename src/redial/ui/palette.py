@@ -1,9 +1,10 @@
 
 palette = [
-    ('body', 'black', 'light gray'),
-    ('flagged', 'black', 'dark green', ('bold', 'underline')),
-    ('focus', 'light gray', 'dark blue', 'standout'),
-    ('flagged focus', 'yellow', 'dark cyan', ('bold', 'standout', 'underline')),
+    ('body', 'black', ''),
+    ('session', 'black', ''),
+    ('session_focus', 'black', 'light cyan'),
+    ('folder', 'black,bold', ''),
+    ('folder_focus', 'black,bold', 'light cyan'),
     ('head', 'yellow', 'black', 'standout'),
     ('foot', 'light gray', 'black'),
     ('key', 'light cyan', 'black', 'underline'),

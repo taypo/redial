@@ -22,10 +22,8 @@ class UITreeWidget(urwid.TreeWidget):
 
     def __init__(self, node):
         self.__super.__init__(node)
-        # insert an extra AttrWrap for our own use
-        self._w = urwid.AttrWrap(self._w, None)
-        self.flagged = False
-        self.update_w()
+        # set style for node type
+        self._w = urwid.AttrWrap(self._w, node.get_value().nodetype, node.get_value().nodetype + "_focus")
 
     def get_display_text(self):
         return self.get_node().get_value().name
@@ -44,9 +42,6 @@ class UITreeWidget(urwid.TreeWidget):
         if key == "enter":
             if isinstance(self.get_node(), UITreeNode):
                 close_ui_and_run(this_node.hostinfo.get_ssh_command())
-
-            self.flagged = not self.flagged
-            self.update_w()
 
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
@@ -70,17 +65,6 @@ class UITreeWidget(urwid.TreeWidget):
         elif key in ('q', 'Q'):
             close_ui_and_exit()
         return key
-
-    # TODO do we need this?
-    def update_w(self):
-        """Update the attributes of self.widget based on self.flagged.
-        """
-        if self.flagged:
-            self._w.attr = 'flagged'
-            self._w.focus_attr = 'flagged focus'
-        else:
-            self._w.attr = 'body'
-            self._w.focus_attr = 'focus'
 
 
 class UITreeListBox(urwid.TreeListBox):
