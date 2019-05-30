@@ -90,14 +90,17 @@ class RemoveHostDialog:
         footer = urwid.GridFlow([ok_btn, cancel_btn], 12, 1, 1, 'center')
 
         body = urwid.Filler(
-            urwid.Text("Are you sure?")
+            urwid.Pile([
+                urwid.Text("Are you sure?"),
+                urwid.Text(""),
+                footer
+            ])
         )
 
         # Layout
         layout = urwid.Frame(
             body,
-            header=header,
-            footer = footer
+            header=header
         )
 
         w = urwid.Overlay(
