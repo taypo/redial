@@ -44,18 +44,20 @@ class UITreeWidget(urwid.TreeWidget):
         if key in ("-", "left") and not self.is_leaf:
             self.expanded = False
             self.update_expanded_icon()
+
         elif key == "f5" and self.is_leaf:
-            hostinfo = this_node.hostinfo
-            # TODO move to util. username might be empty, other settings port etc.
-            close_ui_and_run("mc . sh://" + hostinfo.username + "@" + hostinfo.ip + ":" + hostinfo.port + "/home/" + hostinfo.username)
+            close_ui_and_run(this_node.hostinfo.get_mc_command())
+
         elif key == "f7":
             AddHostDialog(State, parent_node, reset_layout).show()
+
         elif key == "f8":
             if this_node.nodetype == "folder":
                 # TODO implement removing folder
                 MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
             else:
                 RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
+
         if key:
             key = self.unhandled_keys(size, key)
         return key
