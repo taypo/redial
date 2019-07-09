@@ -156,9 +156,10 @@ class RedialApplication:
 
     def main(self):
         # Set screen to 256 color mode
+        if State.last_focus is not None:
+            self.listbox.set_focus(State.last_focus)
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
-
         self.loop = urwid.MainLoop(self.view, palette, screen)
         State.loop = self.loop
         State.body = self.view
@@ -181,6 +182,7 @@ def close_ui_and_exit():
 
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
+    State.last_focus = None
 
     while True:
         # init selection
@@ -192,7 +194,8 @@ def run():
         sessions = State.config.get_sessions()
 
         # run UI
-        RedialApplication(sessions).main()
+        app = RedialApplication(sessions)
+        app.main()
 
         # exit or call other program
         os.system("clear")
@@ -200,6 +203,7 @@ def run():
             break
 
         if State.command:
+            _, State.last_focus = app.listbox.get_focus()
             os.system(State.command)
             State.command = ""
 
