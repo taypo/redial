@@ -21,7 +21,7 @@ class AddHostDialog:
 
     def show(self):
         # Header
-        header_text = urwid.Text('Add Connection', align='center')
+        header_text = urwid.Text('Edit Connection' if self.target.name else "Add Connection", align='center')
         header = urwid.AttrMap(header_text, 'dialog')
 
         # Footer
