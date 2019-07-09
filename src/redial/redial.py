@@ -4,6 +4,8 @@ import signal
 import urwid
 
 from redial.config import Config
+from redial.hostinfo import HostInfo
+from redial.tree.node import Node
 from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog,RemoveHostDialog,MessageDialog
 from redial.ui.palette import palette
@@ -51,7 +53,7 @@ class UITreeWidget(urwid.TreeWidget):
             close_ui_and_run(this_node.hostinfo.get_mc_command())
 
         elif key == "f7":
-            AddHostDialog(State, parent_node, reset_layout).show()
+            AddHostDialog(State, parent_node, Node("", "session", HostInfo("")), reset_layout).show()
 
         elif key == "f8":
             if this_node.nodetype == "folder":
@@ -59,9 +61,8 @@ class UITreeWidget(urwid.TreeWidget):
                 MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
             else:
                 RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
-        # TODO implement edit
-        # elif key == "f9":
-        #    AddHostDialog(State, parent_node, reset_layout).show()
+        elif key == "f9":
+            AddHostDialog(State, parent_node, this_node, reset_layout).show()
         elif key in ('q', 'Q'):
             close_ui_and_exit()
         return key
@@ -150,7 +151,7 @@ class RedialApplication:
                                # copySshKeyButton,
                                addButton,
                                deleteButton,
-                               # editButton,
+                               editButton,
                                # helpButton,
                                quitButton], 18, 1, 0, 'center')
 

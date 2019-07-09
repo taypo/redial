@@ -14,4 +14,7 @@ palette = [
     ('error', 'dark red', 'light gray'),
     ('fbutton', 'black', 'dark gray', '', 'g0', '#a8a'),
     ('fbutton_sc', 'dark red', 'black', 'bold', '#600', '#d86'),
+    ('dialog', 'dark red', 'light blue', '', 'g0', '#a8a'),
+    ('dialog_button', 'dark red', 'light blue', '', '#600', '#a8a'),
+    ('dialog_button_focus', 'dark red', 'light blue', '', '#600', '#d86'),
 ]

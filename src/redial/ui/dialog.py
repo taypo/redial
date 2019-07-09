@@ -6,29 +6,30 @@ from redial.tree.node import Node
 
 class AddHostDialog:
 
-    def __init__(self, state, parent: Node, on_close):
+    def __init__(self, state, parent: Node, target: Node, on_close):
         self.loop = state.loop
         self.config = state.config
         self.parent = parent
+        self.target = target
         self.on_close = on_close
 
         # Form Fields
-        self.connection_name = urwid.Edit("Connection Name: ")
-        self.ip = urwid.Edit("IP: ")
-        self.username = urwid.Edit("Username: ")
-        self.port = urwid.Edit("Port: ", "22")
+        self.connection_name = urwid.Edit("Connection Name: ", target.hostinfo.full_name)
+        self.ip = urwid.Edit("IP: ", target.hostinfo.ip)
+        self.username = urwid.Edit("Username: ", target.hostinfo.username)
+        self.port = urwid.Edit("Port: ", "22", target.hostinfo.port)
 
     def show(self):
         # Header
-        header_text = urwid.Text(('banner', 'Add Connection'), align='center')
-        header = urwid.AttrMap(header_text, 'banner')
+        header_text = urwid.Text('Add Connection', align='center')
+        header = urwid.AttrMap(header_text, 'dialog')
 
         # Footer
         save_btn = urwid.Button('Save', self.on_save)
-        save_btn = urwid.AttrWrap(save_btn, 'selectable', 'focus')
+        save_btn = urwid.AttrWrap(save_btn, 'dialog_button', 'dialog_button_focus')
 
         cancel_btn = urwid.Button('Cancel', self.on_cancel)
-        cancel_btn = urwid.AttrWrap(cancel_btn, 'selectable', 'focus')
+        cancel_btn = urwid.AttrWrap(cancel_btn, 'dialog_button', 'dialog_button_focus')
 
         footer = urwid.GridFlow([save_btn, cancel_btn], 12, 1, 1, 'center')
 
@@ -39,11 +40,10 @@ class AddHostDialog:
         # Layout
         layout = urwid.Frame(
             body,
-            header=header
-        )
+            header=header)
 
         w = urwid.Overlay(
-            urwid.LineBox(layout),
+            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             self.loop.widget,
             align='center',
             width=40,
@@ -59,8 +59,10 @@ class AddHostDialog:
         host_info.port = self.port.edit_text
         host_info.username = self.username.edit_text
 
-        node = Node(self.connection_name.edit_text, "session", host_info)
-        self.config.add_node(self.parent, node)
+        self.target.name = self.connection_name.edit_text
+        self.target.hostinfo = host_info
+
+        self.config.add_node(self.parent, self.target)
 
         self.on_close()
 
@@ -79,15 +81,15 @@ class RemoveHostDialog:
 
     def show(self):
         # Header
-        header_text = urwid.Text(('banner', 'Remove Connection: ' + self.node.name), align='center')
-        header = urwid.AttrMap(header_text, 'banner')
+        header_text = urwid.Text('Remove Connection: ' + self.node.name, align='center')
+        header = urwid.AttrMap(header_text, 'dialog')
 
         # Footer
         ok_btn = urwid.Button('Ok', self.on_ok)
-        ok_btn = urwid.AttrWrap(ok_btn, 'selectable', 'focus')
+        ok_btn = urwid.AttrWrap(ok_btn, 'dialog_button', 'dialog_button_focus')
 
         cancel_btn = urwid.Button('Cancel', self.on_cancel)
-        cancel_btn = urwid.AttrWrap(cancel_btn, 'selectable', 'focus')
+        cancel_btn = urwid.AttrWrap(cancel_btn, 'dialog_button', 'dialog_button_focus')
 
         footer = urwid.GridFlow([ok_btn, cancel_btn], 12, 1, 1, 'center')
 
@@ -106,7 +108,7 @@ class RemoveHostDialog:
         )
 
         w = urwid.Overlay(
-            urwid.LineBox(layout),
+            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             self.loop.widget,
             align='center',
             width=40,
@@ -134,12 +136,12 @@ class MessageDialog:
 
     def show(self):
         # Header
-        header_text = urwid.Text(('banner', self.title), align='center')
-        header = urwid.AttrMap(header_text, 'banner')
+        header_text = urwid.Text(self.title, align='center')
+        header = urwid.AttrMap(header_text, 'dialog')
 
         # Footer
         ok_btn = urwid.Button('Ok', self.on_ok)
-        ok_btn = urwid.AttrWrap(ok_btn, 'selectable', 'focus')
+        ok_btn = urwid.AttrWrap(ok_btn, 'dialog_button', 'dialog_button_focus')
 
         footer = urwid.GridFlow([ok_btn], 12, 1, 1, 'center')
 
@@ -158,7 +160,7 @@ class MessageDialog:
         )
 
         w = urwid.Overlay(
-            urwid.LineBox(layout),
+            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             self.loop.widget,
             align='center',
             width=40,
