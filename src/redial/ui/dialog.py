@@ -17,7 +17,7 @@ class AddHostDialog:
         self.connection_name = urwid.Edit("Connection Name: ", target.name)
         self.ip = urwid.Edit("IP: ", target.hostinfo.ip)
         self.username = urwid.Edit("Username: ", target.hostinfo.username)
-        self.port = urwid.Edit("Port: ", "22", target.hostinfo.port)
+        self.port = urwid.Edit("Port: ", target.hostinfo.port if self.target.name else "22")
 
     def show(self):
         # Header
