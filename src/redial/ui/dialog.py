@@ -14,7 +14,7 @@ class AddHostDialog:
         self.on_close = on_close
 
         # Form Fields
-        self.connection_name = urwid.Edit("Connection Name: ", target.hostinfo.full_name)
+        self.connection_name = urwid.Edit("Connection Name: ", target.name)
         self.ip = urwid.Edit("IP: ", target.hostinfo.ip)
         self.username = urwid.Edit("Username: ", target.hostinfo.username)
         self.port = urwid.Edit("Port: ", "22", target.hostinfo.port)
