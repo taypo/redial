@@ -55,7 +55,7 @@ class Config:
 
     # Private Methods
     __CONFIG_PATH = ".ssh/"
-    __CONFIG_FILE = "config"
+    __CONFIG_FILE = "redial.config"
 
     def __get_or_create_config_file(self) -> str:
         home = os.path.expanduser("~")
