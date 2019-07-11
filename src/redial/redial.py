@@ -9,6 +9,7 @@ from redial.tree.node import Node
 from redial.ui.footer import FooterButton
 from redial.ui.dialog import AddHostDialog,RemoveHostDialog,MessageDialog
 from redial.ui.palette import palette
+from redial.utils import package_available
 
 
 # TODO get rid of this if possible
@@ -50,7 +51,11 @@ class UITreeWidget(urwid.TreeWidget):
             self.update_expanded_icon()
 
         elif key == "f5" and self.is_leaf:
-            close_ui_and_run(this_node.hostinfo.get_mc_command())
+            if package_available(package_name="mc"):
+                close_ui_and_run(this_node.hostinfo.get_mc_command())
+            else:
+                MessageDialog(State, "Error", "Please install mc (Midnight Commander) package"
+                                              " to use this feature", reset_layout).show()
 
         elif key == "f7":
             AddHostDialog(State, parent_node, Node("", "session", HostInfo("")), reset_layout).show()
