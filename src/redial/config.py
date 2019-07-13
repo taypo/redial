@@ -56,7 +56,7 @@ class Config:
 
     # Private Methods
     __CONFIG_PATH = xdg.get_config_dir()
-    __CONFIG_FILE = "config"
+    __CONFIG_FILE = "sessions"
 
     def __get_or_create_config_file(self) -> str:
         full_path = self.__CONFIG_PATH + "/" + self.__CONFIG_FILE
