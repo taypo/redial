@@ -13,4 +13,4 @@ class FooterButton(urwid.Button):
         self._w = urwid.AttrWrap(urwid.Text([('fbutton_sc', " " + sc + " "), " ", ('fbutton', caption)]), 'fbutton')
 
     def on_click(self, widget_on_focus):
-        widget_on_focus[0].keypress(0, self.key)
+        widget_on_focus[0].keypress((0, ), self.key)
