@@ -51,7 +51,7 @@ class UITreeWidget(urwid.TreeWidget):
             self.update_expanded_icon()
 
         elif key == "f5" and self.is_leaf:
-            if package_available(package_name="mc") and isinstance(self.get_node(), UITreeNode):
+            if package_available(package_name="mc"):
                 close_ui_and_run(this_node.hostinfo.get_mc_command())
             else:
                 MessageDialog(State, "Error", "Please install mc (Midnight Commander) package"
@@ -66,9 +66,8 @@ class UITreeWidget(urwid.TreeWidget):
                 MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
             else:
                 RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
-        elif key == "f9":
-            if isinstance(self.get_node(), UITreeNode):
-                AddHostDialog(State, parent_node, this_node, reset_layout).show()
+        elif key == "f9" and self.is_leaf:
+            AddHostDialog(State, parent_node, this_node, reset_layout).show()
         elif key in ('q', 'Q'):
             close_ui_and_exit()
         return key
