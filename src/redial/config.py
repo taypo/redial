@@ -1,3 +1,4 @@
+from redial import xdg
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
 import os
@@ -54,15 +55,11 @@ class Config:
         self.save_to_file()
 
     # Private Methods
-    __CONFIG_PATH = ".ssh/"
-    __CONFIG_FILE = "redial.config"
+    __CONFIG_PATH = xdg.get_config_dir()
+    __CONFIG_FILE = "sessions"
 
     def __get_or_create_config_file(self) -> str:
-        home = os.path.expanduser("~")
-        directory = home + "/" + self.__CONFIG_PATH
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        full_path = directory + self.__CONFIG_FILE
+        full_path = self.__CONFIG_PATH + "/" + self.__CONFIG_FILE
         if not os.path.isfile(full_path):
             file = open(full_path, "w")
             file.close()
