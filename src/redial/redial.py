@@ -66,7 +66,7 @@ class UITreeWidget(urwid.TreeWidget):
                 MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
             else:
                 RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
-        elif key == "f9":
+        elif key == "f9" and self.is_leaf:
             AddHostDialog(State, parent_node, this_node, reset_layout).show()
         elif key in ('q', 'Q'):
             close_ui_and_exit()
@@ -143,17 +143,19 @@ class RedialApplication:
             footer=self.footer)
 
     def initFooter(self):
-        connectButton = FooterButton(u"\u23ce", "Connect")
-        mcButton = FooterButton("F5", "Browse")
-        copySshKeyButton = FooterButton("F6", "Copy SSH Key")
-        addButton = FooterButton("F7", "Add")
-        deleteButton = FooterButton("F8", "Remove")
-        editButton = FooterButton("F9", "Edit")
-        helpButton = FooterButton("F1", "Help")
-        quitButton = FooterButton("Q", "Quit")
+        connectButton = FooterButton(u"\u23ce", "Connect", "enter", self.on_footer_click)
+        mcButton = FooterButton("F5", "Browse", "f5", self.on_footer_click)
+        copySshKeyButton = FooterButton("F6", "Copy SSH Key", "f6", self.on_footer_click)
+        addButton = FooterButton("F7", "Add", "f7", self.on_footer_click)
+        deleteButton = FooterButton("F8", "Remove", "f8", self.on_footer_click)
+        editButton = FooterButton("F9", "Edit", "f9", self.on_footer_click)
+        helpButton = FooterButton("F1", "Help", "f1", self.on_footer_click)
+        quitButton = FooterButton("Q", "Quit", "q", self.on_footer_click)
+        # TODO keys that dont depend on selected node should be handled differently
+
         return urwid.GridFlow([connectButton,
                                mcButton,
-                               # copySshKeyButton,
+                               #copySshKeyButton,
                                addButton,
                                deleteButton,
                                editButton,
@@ -170,6 +172,9 @@ class RedialApplication:
         State.loop = self.loop
         State.body = self.view
         self.loop.run()
+
+    def on_footer_click(self, button: FooterButton):
+        button.on_click(self.listbox.get_focus())
 
 
 def sigint_handler(signum, frame):
