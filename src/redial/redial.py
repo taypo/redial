@@ -85,7 +85,9 @@ class UITreeListBox(urwid.TreeListBox):
                 self.move_focus_to_parent(size)
 
         else:
-            self.__super.keypress(size, key)
+            if key not in ['home', 'end']:
+                self.__super.keypress(size, key)
+
 
 
 class UITreeNode(urwid.TreeNode):
