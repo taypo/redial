@@ -7,7 +7,7 @@ from redial.config import Config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
 from redial.ui.footer import FooterButton
-from redial.ui.dialog import AddHostDialog,RemoveHostDialog,MessageDialog
+from redial.ui.dialog import AddHostDialog, RemoveHostDialog, MessageDialog, AddFolderDialog
 from redial.ui.palette import palette
 from redial.utils import package_available
 
@@ -39,7 +39,7 @@ class UITreeWidget(urwid.TreeWidget):
         key = self.__super.keypress(size, key)
 
         this_node = self.get_node().get_value()
-        parent_node = self.get_node().get_value() if (self.get_node().get_parent() is None) \
+        parent_node = this_node if (self.get_node().get_parent() is None or this_node.nodetype == "folder") \
             else self.get_node().get_parent().get_value()
 
         if key == "enter":
@@ -56,6 +56,9 @@ class UITreeWidget(urwid.TreeWidget):
             else:
                 MessageDialog(State, "Error", "Please install mc (Midnight Commander) package"
                                               " to use this feature", reset_layout).show()
+
+        elif key == "f6":
+            AddFolderDialog(State, parent_node, Node("", "folder"), reset_layout).show()
 
         elif key == "f7":
             AddHostDialog(State, parent_node, Node("", "session", HostInfo("")), reset_layout).show()
@@ -114,7 +117,7 @@ class UIParentNode(urwid.ParentNode):
         return range(len(data.children))
 
     def load_child_node(self, key):
-        """Return either an ExampleNode or ExampleParentNode"""
+        """Return either an UITreeNode or UIParentNode"""
         childdata = self.get_value().children[key]
         childdepth = self.get_depth() + 1
         if 'folder' in childdata.nodetype:
@@ -147,21 +150,20 @@ class RedialApplication:
     def initFooter(self):
         connectButton = FooterButton(u"\u23ce", "Connect", "enter", self.on_footer_click)
         mcButton = FooterButton("F5", "Browse", "f5", self.on_footer_click)
-        copySshKeyButton = FooterButton("F6", "Copy SSH Key", "f6", self.on_footer_click)
-        addButton = FooterButton("F7", "Add", "f7", self.on_footer_click)
+        addFolderButton = FooterButton("F6", "New Folder", "f6", self.on_footer_click)
+        addButton = FooterButton("F7", "New Conn.", "f7", self.on_footer_click)
         deleteButton = FooterButton("F8", "Remove", "f8", self.on_footer_click)
         editButton = FooterButton("F9", "Edit", "f9", self.on_footer_click)
-        helpButton = FooterButton("F1", "Help", "f1", self.on_footer_click)
         quitButton = FooterButton("Q", "Quit", "q", self.on_footer_click)
         # TODO keys that dont depend on selected node should be handled differently
 
         return urwid.GridFlow([connectButton,
                                mcButton,
-                               #copySshKeyButton,
+                               # TODO join add buttons to one
+                               addFolderButton,
                                addButton,
                                deleteButton,
                                editButton,
-                               # helpButton,
                                quitButton], 18, 1, 0, 'center')
 
     def main(self):
@@ -197,17 +199,17 @@ def run():
     signal.signal(signal.SIGINT, sigint_handler)
     State.last_focus = None
 
+    # read configuration
+    State.config = Config()
+    State.sessions = State.config.get_sessions()
+
     while True:
         # init selection
         State.command = ""
         State.exit = False
 
-        # read configuration
-        State.config = Config()
-        sessions = State.config.get_sessions()
-
         # run UI
-        app = RedialApplication(sessions)
+        app = RedialApplication(State.sessions)
         app.main()
 
         # exit or call other program
