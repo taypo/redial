@@ -19,6 +19,9 @@ class State: pass
 def reset_layout():
     raise urwid.ExitMainLoop()
 
+def on_focus_change():
+    State.focused = State.listbox.get_focus()[0]
+
 
 class UITreeWidget(urwid.TreeWidget):
     """ Display widget for leaf nodes """
@@ -29,7 +32,11 @@ class UITreeWidget(urwid.TreeWidget):
         self._w = urwid.AttrWrap(self._w, node.get_value().nodetype, node.get_value().nodetype + "_focus")
 
     def get_display_text(self):
-        return self.get_node().get_value().name
+        focused = State.focused
+        if State.focused and State.focused.get_node() == self.get_node():
+            return self.get_node().get_value().name + " " + self.get_node().get_value().hostinfo.ip
+        else:
+            return self.get_node().get_value().name
 
     def selectable(self):
         return True
@@ -89,7 +96,6 @@ class UITreeListBox(urwid.TreeListBox):
                 self.__super.keypress(size, key)
 
 
-
 class UITreeNode(urwid.TreeNode):
     """ Data storage object for leaf nodes """
 
@@ -101,6 +107,9 @@ class UITreeNode(urwid.TreeNode):
         parent = UIParentNode(parentname)
         parent.set_child_node(self.get_key(), self)
         return parent
+    
+    def get_widget(self, reload=False):
+        return super().get_widget(True)
 
 
 class UIParentNode(urwid.ParentNode):
@@ -134,7 +143,10 @@ class RedialApplication:
 
     def __init__(self, data=None):
         self.topnode = UIParentNode(data)
-        self.listbox = UITreeListBox(urwid.TreeWalker(self.topnode))
+        walker = urwid.TreeWalker(self.topnode)
+        urwid.connect_signal(walker, "modified", on_focus_change)
+        self.listbox = UITreeListBox(walker)
+        State.listbox = self.listbox
         self.listbox.offset_rows = 1
         self.header = urwid.Text("Redial")
         self.footer = self.initFooter()
@@ -196,6 +208,7 @@ def close_ui_and_exit():
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
     State.last_focus = None
+    State.focused = None
 
     while True:
         # init selection
