@@ -42,9 +42,10 @@ class AddHostDialog:
             body,
             header=header)
 
-        w = urwid.Overlay(
-            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            self.loop.widget,
+        w = DialogOverlay(
+            on_close=self.on_close,
+            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            bottom_w=self.loop.widget,
             align='center',
             width=40,
             valign='middle',
@@ -107,9 +108,10 @@ class RemoveHostDialog:
             header=header
         )
 
-        w = urwid.Overlay(
-            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            self.loop.widget,
+        w = DialogOverlay(
+            on_close=self.on_close,
+            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            bottom_w=self.loop.widget,
             align='center',
             width=40,
             valign='middle',
@@ -159,9 +161,10 @@ class MessageDialog:
             header=header
         )
 
-        w = urwid.Overlay(
-            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            self.loop.widget,
+        w = DialogOverlay(
+            on_close=self.on_close,
+            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            bottom_w=self.loop.widget,
             align='center',
             width=40,
             valign='middle',
@@ -172,3 +175,20 @@ class MessageDialog:
 
     def on_ok(self, args):
         self.on_close()
+
+
+class DialogOverlay(urwid.Overlay):
+
+    def __init__(self, on_close, **kwargs):
+        self.on_close = on_close
+        super(DialogOverlay, self).__init__(**kwargs)
+
+    def keypress(self, size, key):
+        if key == 'shift tab':
+            key = 'up'
+        elif key == 'tab':
+            key = 'down'
+        elif key == 'esc':
+            self.on_close()
+
+        super().keypress(size, key)
