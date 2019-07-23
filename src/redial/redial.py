@@ -20,6 +20,10 @@ def reset_layout():
     raise urwid.ExitMainLoop()
 
 
+def on_focus_change():
+    State.focused = State.listbox.get_focus()
+
+
 class UITreeWidget(urwid.TreeWidget):
     """ Display widget for leaf nodes """
 
@@ -29,7 +33,11 @@ class UITreeWidget(urwid.TreeWidget):
         self._w = urwid.AttrWrap(self._w, node.get_value().nodetype, node.get_value().nodetype + "_focus")
 
     def get_display_text(self):
-        return self.get_node().get_value().name
+        focused = State.focused[0]
+        if focused and focused.get_node() == self.get_node():
+            return self.get_node().get_value().name + " " + self.get_node().get_value().hostinfo.ip
+        else:
+            return self.get_node().get_value().name
 
     def selectable(self):
         return True
@@ -89,7 +97,6 @@ class UITreeListBox(urwid.TreeListBox):
                 self.__super.keypress(size, key)
 
 
-
 class UITreeNode(urwid.TreeNode):
     """ Data storage object for leaf nodes """
 
@@ -101,6 +108,9 @@ class UITreeNode(urwid.TreeNode):
         parent = UIParentNode(parentname)
         parent.set_child_node(self.get_key(), self)
         return parent
+    
+    def get_widget(self, reload=False):
+        return super().get_widget(True)
 
 
 class UIParentNode(urwid.ParentNode):
@@ -134,7 +144,10 @@ class RedialApplication:
 
     def __init__(self, data=None):
         self.topnode = UIParentNode(data)
-        self.listbox = UITreeListBox(urwid.TreeWalker(self.topnode))
+        walker = urwid.TreeWalker(self.topnode)
+        urwid.connect_signal(walker, "modified", on_focus_change)
+        self.listbox = UITreeListBox(walker)
+        State.listbox = self.listbox
         self.listbox.offset_rows = 1
         self.header = urwid.Text("Redial")
         self.footer = self.initFooter()
@@ -166,8 +179,8 @@ class RedialApplication:
 
     def main(self):
         # Set screen to 256 color mode
-        if State.last_focus is not None:
-            self.listbox.set_focus(State.last_focus)
+        if State.focused[1]:
+            self.listbox.set_focus(State.focused[1])
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
         self.loop = urwid.MainLoop(self.view, palette, screen)
@@ -195,7 +208,7 @@ def close_ui_and_exit():
 
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
-    State.last_focus = None
+    State.focused = [None, None]
 
     while True:
         # init selection
@@ -216,7 +229,6 @@ def run():
             break
 
         if State.command:
-            _, State.last_focus = app.listbox.get_focus()
             os.system(State.command)
             State.command = ""
 
