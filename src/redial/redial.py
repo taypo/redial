@@ -19,6 +19,7 @@ class State: pass
 def reset_layout():
     raise urwid.ExitMainLoop()
 
+
 def on_focus_change():
     State.focused = State.listbox.get_focus()[0]
 
@@ -32,7 +33,6 @@ class UITreeWidget(urwid.TreeWidget):
         self._w = urwid.AttrWrap(self._w, node.get_value().nodetype, node.get_value().nodetype + "_focus")
 
     def get_display_text(self):
-        focused = State.focused
         if State.focused and State.focused.get_node() == self.get_node():
             return self.get_node().get_value().name + " " + self.get_node().get_value().hostinfo.ip
         else:
@@ -207,6 +207,7 @@ def close_ui_and_exit():
 
 def run():
     signal.signal(signal.SIGINT, sigint_handler)
+    # TODO below two should be simplified.
     State.last_focus = None
     State.focused = None
 
