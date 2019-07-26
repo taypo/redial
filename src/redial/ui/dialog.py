@@ -128,6 +128,62 @@ class RemoveHostDialog:
         self.on_close()
 
 
+class AddFolderDialog:
+
+    def __init__(self, state, parent: Node, target: Node, on_close):
+        self.main_widget = state.loop.widget
+        self.loop = state.loop
+        self.config = state.config
+        self.parent = parent
+        self.target = target
+        self.on_close = on_close
+
+        # Form Fields
+        self.folder_name = urwid.Edit("Folder Name: ", target.name)
+
+    def show(self):
+        # Header
+        header_text = urwid.Text('Edit Folder' if self.target.name else "Add Folder", align='center')
+        header = urwid.AttrMap(header_text, 'dialog')
+
+        # Footer
+        save_btn = urwid.Button('Save', self.on_save)
+        save_btn = urwid.AttrWrap(save_btn, 'dialog_button', 'dialog_button_focus')
+
+        cancel_btn = urwid.Button('Cancel', self.on_cancel)
+        cancel_btn = urwid.AttrWrap(cancel_btn, 'dialog_button', 'dialog_button_focus')
+
+        footer = urwid.GridFlow([save_btn, cancel_btn], 12, 1, 1, 'center')
+
+        body = urwid.Filler(
+            urwid.Pile([self.folder_name, footer])
+        )
+
+        # Layout
+        layout = urwid.Frame(
+            body,
+            header=header)
+
+        w = urwid.Overlay(
+            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            self.loop.widget,
+            align='center',
+            width=40,
+            valign='middle',
+            height=10
+        )
+
+        self.loop.widget = w
+
+    def on_save(self, args):
+        self.target.name = self.folder_name.edit_text
+        self.config.add_node(self.parent, self.target)
+        self.on_close()
+
+    def on_cancel(self, args):
+        self.on_close()
+
+
 class MessageDialog:
 
     def __init__(self, state, title, message, on_close):
