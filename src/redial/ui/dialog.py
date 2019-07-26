@@ -44,6 +44,7 @@ class AddHostDialog:
 
         w = DialogOverlay(
             on_close=self.on_close,
+            on_enter=self.on_save,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             bottom_w=self.loop.widget,
             align='center',
@@ -54,7 +55,7 @@ class AddHostDialog:
 
         self.loop.widget = w
 
-    def on_save(self, args):
+    def on_save(self):
         host_info = HostInfo(self.connection_name.edit_text)
         host_info.ip = self.ip.edit_text
         host_info.port = self.port.edit_text
@@ -110,6 +111,7 @@ class RemoveHostDialog:
 
         w = DialogOverlay(
             on_close=self.on_close,
+            on_enter=self.on_ok,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             bottom_w=self.loop.widget,
             align='center',
@@ -120,7 +122,7 @@ class RemoveHostDialog:
 
         self.loop.widget = w
 
-    def on_ok(self, args):
+    def on_ok(self):
         self.config.delete_node(self.parent, self.node)
         self.on_close()
 
@@ -164,9 +166,11 @@ class AddFolderDialog:
             body,
             header=header)
 
-        w = urwid.Overlay(
-            urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            self.loop.widget,
+        w = DialogOverlay(
+            on_close=self.on_close,
+            on_enter=self.on_save,
+            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            bottom_w=self.loop.widget,
             align='center',
             width=40,
             valign='middle',
@@ -175,7 +179,7 @@ class AddFolderDialog:
 
         self.loop.widget = w
 
-    def on_save(self, args):
+    def on_save(self):
         self.target.name = self.folder_name.edit_text
         self.config.add_node(self.parent, self.target)
         self.on_close()
@@ -219,6 +223,7 @@ class MessageDialog:
 
         w = DialogOverlay(
             on_close=self.on_close,
+            on_enter=self.on_ok,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             bottom_w=self.loop.widget,
             align='center',
@@ -229,14 +234,15 @@ class MessageDialog:
 
         self.loop.widget = w
 
-    def on_ok(self, args):
+    def on_ok(self):
         self.on_close()
 
 
 class DialogOverlay(urwid.Overlay):
 
-    def __init__(self, on_close, **kwargs):
+    def __init__(self, on_close, on_enter, **kwargs):
         self.on_close = on_close
+        self.on_enter = on_enter
         super(DialogOverlay, self).__init__(**kwargs)
 
     def keypress(self, size, key):
@@ -246,5 +252,7 @@ class DialogOverlay(urwid.Overlay):
             key = 'down'
         elif key == 'esc':
             self.on_close()
+        elif key == 'enter':
+            self.on_enter()
 
         super().keypress(size, key)
