@@ -20,6 +20,11 @@ def reset_layout():
     raise urwid.ExitMainLoop()
 
 
+def reload_data():
+    State.walker.set_focus(UIParentNode(State.sessions))
+    State.loop.widget = State.body
+
+
 def on_focus_change():
     State.focused = State.listbox.get_focus()[0]
 
@@ -65,19 +70,19 @@ class UITreeWidget(urwid.TreeWidget):
                                               " to use this feature", reset_layout).show()
 
         elif key == "f6":
-            AddFolderDialog(State, parent_node, Node("", "folder"), reset_layout).show()
+            AddFolderDialog(State, parent_node, Node("", "folder"), reload_data).show()
 
         elif key == "f7":
-            AddHostDialog(State, parent_node, Node("", "session", HostInfo("")), reset_layout).show()
+            AddHostDialog(State, parent_node, Node("", "session", HostInfo("")), reload_data).show()
 
         elif key == "f8":
             if this_node.nodetype == "folder":
                 # TODO implement removing folder
-                MessageDialog(State, "Error", "Folders can not be removed", reset_layout).show()
+                MessageDialog(State, "Error", "Folders can not be removed", reload_data).show()
             else:
-                RemoveHostDialog(State, parent_node, this_node, reset_layout).show()
+                RemoveHostDialog(State, parent_node, this_node, reload_data).show()
         elif key == "f9" and self.is_leaf:
-            AddHostDialog(State, parent_node, this_node, reset_layout).show()
+            AddHostDialog(State, parent_node, this_node, reload_data).show()
         elif key in ('q', 'Q'):
             close_ui_and_exit()
         return key
@@ -147,6 +152,7 @@ class RedialApplication:
     def __init__(self, data=None):
         self.topnode = UIParentNode(data)
         walker = urwid.TreeWalker(self.topnode)
+        State.walker = walker
         urwid.connect_signal(walker, "modified", on_focus_change)
         self.listbox = UITreeListBox(walker)
         State.listbox = self.listbox
