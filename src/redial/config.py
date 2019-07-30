@@ -5,10 +5,8 @@ import os
 
 
 class Config:
-    def __init__(self):
-        self.sessions = Node(".")
-        self.load_from_file()
 
+    # todo make static
     def load_from_file(self):
         hosts = []
         with open(self.__get_or_create_config_file(), "r") as file:
@@ -37,11 +35,12 @@ class Config:
             if host_info is not None:
                 hosts.append(host_info)
 
-        self.sessions = self.__construct_tree(hosts)
+        return self.__construct_tree(hosts)
 
-    def save_to_file(self):
+    # todo make static
+    def save_to_file(self, sessions):
         with open(self.__get_or_create_config_file(), "w") as file:
-            self.__append_node_to_file(self.sessions, "", file)
+            self.__append_node_to_file(sessions, "", file)
 
     def get_sessions(self) -> Node:
         return self.sessions

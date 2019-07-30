@@ -1,7 +1,12 @@
+import os
+
 import urwid
 from redial.config import Config
+from redial.hostinfo import HostInfo
+from redial.tree.node import Node
+from redial.ui.dialog import AddHostDialog
 from redial.ui.footer import FooterButton
-from redial.ui.tree import UIParentNode
+from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode
 from redial.ui.palette import palette
 
 
@@ -9,10 +14,10 @@ class RedialApplication:
 
     def __init__(self):
         # TODO write two static methods config.save and config.load
-        self.sessions = Config().get_sessions()
-        top_node = UIParentNode(self.sessions)
-        walker = urwid.TreeWalker(top_node)
-        self.listbox = urwid.TreeListBox(walker)
+        self.sessions = Config().load_from_file()
+        top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
+        self.walker = urwid.TreeWalker(top_node)
+        self.listbox = urwid.TreeListBox(self.walker)
         header = urwid.Text("Redial")
         footer = self.init_footer()
 
@@ -21,12 +26,45 @@ class RedialApplication:
             header=urwid.AttrWrap(header, 'head'),
             footer=footer)
 
-    def run(self):
         # Set screen to 256 color mode
         screen = urwid.raw_display.Screen()
         screen.set_terminal_properties(256)
-        loop = urwid.MainLoop(self.view, palette, screen)
-        loop.run()
+        self.loop = urwid.MainLoop(self.view, palette, screen)
+
+        # instance attributes
+        self.command = None
+
+    def run(self):
+        self.loop.run()
+
+    def on_key_press(self, key: str, w: UITreeWidget):
+        this_node = w.get_node().get_value()
+        parent_node = this_node if (w.get_node().get_parent() is None or this_node.nodetype == "folder") \
+            else w.get_node().get_parent().get_value()
+
+        if key in 'qQ':
+            raise urwid.ExitMainLoop()
+        elif key == "enter":
+            if isinstance(w.get_node(), UITreeNode):
+                self.command = w.get_node().get_value().hostinfo.get_ssh_command()
+                raise urwid.ExitMainLoop()
+        elif key == "f7":
+            AddHostDialog(parent_node, Node("", "session", HostInfo("")), self.save_and_reload).show(self.loop)
+        elif key == "meta down":
+            # todo preserve focus
+            # todo put controls
+            # todo save
+            i = parent_node.children.index(this_node)
+            parent_node.children[i], parent_node.children[i - 1] = parent_node.children[i - 1], parent_node.children[i]
+            self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
+        else:
+            return key
+
+    def save_and_reload(self):
+        Config().save_to_file(self.sessions)
+        # todo set focus
+        self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
+        self.loop.widget = self.view
 
     # TODO move to footer.py
     def init_footer(self):
@@ -56,6 +94,10 @@ class RedialApplication:
 def run():
     app = RedialApplication()
     app.run()
+
+    # TODO restart application after connection closes
+    if app.command:
+        os.system(app.command)
 
 
 if __name__ == "__main__":

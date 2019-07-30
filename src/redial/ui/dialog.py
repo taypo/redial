@@ -6,9 +6,7 @@ from redial.tree.node import Node
 
 class AddHostDialog:
 
-    def __init__(self, state, parent: Node, target: Node, on_close):
-        self.loop = state.loop
-        self.config = state.config
+    def __init__(self, parent: Node, target: Node, on_close):
         self.parent = parent
         self.target = target
         self.on_close = on_close
@@ -19,7 +17,7 @@ class AddHostDialog:
         self.username = urwid.Edit("Username: ", target.hostinfo.username)
         self.port = urwid.Edit("Port: ", target.hostinfo.port if self.target.name else "22")
 
-    def show(self):
+    def show(self, loop):
         # Header
         header_text = urwid.Text('Edit Connection' if self.target.name else "Add Connection", align='center')
         header = urwid.AttrMap(header_text, 'dialog')
@@ -45,14 +43,14 @@ class AddHostDialog:
         w = DialogOverlay(
             on_close=self.on_close,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
     def on_save(self, args):
         host_info = HostInfo(self.connection_name.edit_text)
@@ -63,7 +61,7 @@ class AddHostDialog:
         self.target.name = self.connection_name.edit_text
         self.target.hostinfo = host_info
 
-        self.config.add_node(self.parent, self.target)
+        self.parent.add_child(self.target)
 
         self.on_close()
 
