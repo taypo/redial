@@ -10,6 +10,7 @@ from redial.ui.footer import init_footer
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
 from redial.utils import package_available
+from functools import partial
 
 
 EXIT_REDIAL = "__EXIT__"
@@ -119,9 +120,10 @@ class RedialApplication:
 
 
 def run():
-    signal.signal(signal.SIGINT, sigint_handler)
 
     app = RedialApplication()
+
+    signal.signal(signal.SIGINT, partial(sigint_handler, app))
 
     while True:
         app.run()
@@ -133,7 +135,8 @@ def run():
                 os.system(app.command)
 
 
-def sigint_handler(signum, frame):
+def sigint_handler(app, signum, frame):
+    app.command = EXIT_REDIAL
     raise urwid.ExitMainLoop()
 
 
