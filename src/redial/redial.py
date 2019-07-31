@@ -53,22 +53,22 @@ class RedialApplication:
         elif key == "f7":
             AddHostDialog(folder_node, Node("", "session", HostInfo("")), self.save_and_reload).show(self.loop)
         elif key in ["meta down", "ctrl down"]:
-            # todo save
             if parent_node is None: return
             i = parent_node.children.index(this_node)
             if i == len(parent_node.children) - 1: return  # at bottom
             parent_node.children[i], parent_node.children[i + 1] = parent_node.children[i + 1], parent_node.children[i]
 
+            Config.save_to_file(self.sessions)
             self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
             self.listbox.set_focus_to_node(this_node)
 
         elif key in ["meta up", "ctrl up"]:
-            # todo save
             if parent_node is None: return
             i = parent_node.children.index(this_node)
             if i == 0: return  # at top
             parent_node.children[i], parent_node.children[i - 1] = parent_node.children[i - 1], parent_node.children[i]
 
+            Config.save_to_file(self.sessions)
             self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
             self.listbox.set_focus_to_node(this_node)
         else:
