@@ -73,6 +73,9 @@ class RedialApplication:
             else:
                 RemoveHostDialog(parent_node, this_node, self.save_and_focus).show(self.loop)
 
+        elif key == "f9" and w.is_leaf:
+            AddHostDialog(parent_node, this_node, self.save_and_focus).show(self.loop)
+
         elif key in ["meta down", "ctrl down"]:
             if parent_node is None: return
             i = parent_node.children.index(this_node)
