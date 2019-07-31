@@ -4,16 +4,16 @@ import urwid
 from redial.config import Config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-from redial.ui.dialog import AddHostDialog
+from redial.ui.dialog import AddHostDialog, MessageDialog
 from redial.ui.footer import FooterButton
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox
 from redial.ui.palette import palette
+from redial.utils import package_available
 
 
 class RedialApplication:
 
     def __init__(self):
-        # TODO write two static methods config.save and config.load
         self.sessions = Config().load_from_file()
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
@@ -46,12 +46,23 @@ class RedialApplication:
 
         if key in 'qQ':
             raise urwid.ExitMainLoop()
+
         elif key == "enter":
             if isinstance(w.get_node(), UITreeNode):
                 self.command = w.get_node().get_value().hostinfo.get_ssh_command()
                 raise urwid.ExitMainLoop()
+
+        elif key == "f5" and w.is_leaf:
+            if package_available(package_name="mc"):
+                self.command = this_node.hostinfo.get_mc_command()
+                raise urwid.ExitMainLoop()
+            else:
+                MessageDialog("Error", "Please install mc (Midnight Commander) package"
+                                       " to use this feature", self.close_dialog).show(self.loop)
+
         elif key == "f7":
-            AddHostDialog(folder_node, Node("", "session", HostInfo("")), self.save_and_reload).show(self.loop)
+            AddHostDialog(folder_node, Node("", "session", HostInfo("")), self.save_and_focus).show(self.loop)
+
         elif key in ["meta down", "ctrl down"]:
             if parent_node is None: return
             i = parent_node.children.index(this_node)
@@ -74,10 +85,13 @@ class RedialApplication:
         else:
             return key
 
-    def save_and_reload(self):
+    def save_and_focus(self, focus: Node):
         Config().save_to_file(self.sessions)
-        # todo set focus
         self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
+        self.listbox.set_focus_to_node(focus)
+        self.loop.widget = self.view
+
+    def close_dialog(self):
         self.loop.widget = self.view
 
     # TODO move to footer.py

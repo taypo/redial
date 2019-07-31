@@ -41,7 +41,7 @@ class AddHostDialog:
             header=header)
 
         w = DialogOverlay(
-            on_close=self.on_close,
+            on_close=lambda: self.on_close(self.parent),
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             bottom_w=loop.widget,
             align='center',
@@ -63,10 +63,10 @@ class AddHostDialog:
 
         self.parent.add_child(self.target)
 
-        self.on_close()
+        self.on_close(self.target)
 
     def on_cancel(self, args):
-        self.on_close()
+        self.on_close(self.parent)
 
 
 class RemoveHostDialog:
@@ -184,13 +184,12 @@ class AddFolderDialog:
 
 class MessageDialog:
 
-    def __init__(self, state, title, message, on_close):
-        self.loop = state.loop
+    def __init__(self, title, message, on_close):
         self.title = title
         self.message = message
         self.on_close = on_close
 
-    def show(self):
+    def show(self, loop):
         # Header
         header_text = urwid.Text(self.title, align='center')
         header = urwid.AttrMap(header_text, 'dialog')
@@ -218,14 +217,14 @@ class MessageDialog:
         w = DialogOverlay(
             on_close=self.on_close,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
     def on_ok(self, args):
         self.on_close()
