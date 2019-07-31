@@ -1,6 +1,7 @@
 import os
 
 import urwid
+from redial.tree.node import Node
 
 
 class UITreeWidget(urwid.TreeWidget):
@@ -21,7 +22,16 @@ class UITreeWidget(urwid.TreeWidget):
 
 
 class UITreeListBox(urwid.TreeListBox):
-    pass
+    def set_focus_to_node(self, node: Node):
+        start = self.focus_position
+        while True:
+            w, n = self.body.get_next(start)
+            if n is None:
+                return
+            if n.get_value() == node:
+                self.set_focus(n)
+                return
+            start = n
 
 
 class UITreeNode(urwid.TreeNode):

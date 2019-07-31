@@ -6,7 +6,7 @@ from redial.hostinfo import HostInfo
 from redial.tree.node import Node
 from redial.ui.dialog import AddHostDialog
 from redial.ui.footer import FooterButton
-from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode
+from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox
 from redial.ui.palette import palette
 
 
@@ -17,7 +17,7 @@ class RedialApplication:
         self.sessions = Config().load_from_file()
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
-        self.listbox = urwid.TreeListBox(self.walker)
+        self.listbox = UITreeListBox(self.walker)
         header = urwid.Text("Redial")
         footer = self.init_footer()
 
@@ -50,13 +50,25 @@ class RedialApplication:
                 raise urwid.ExitMainLoop()
         elif key == "f7":
             AddHostDialog(parent_node, Node("", "session", HostInfo("")), self.save_and_reload).show(self.loop)
-        elif key == "meta down":
-            # todo preserve focus
-            # todo put controls
+        elif key in ["meta down", "ctrl down"]:
+            # todo move folders
             # todo save
             i = parent_node.children.index(this_node)
-            parent_node.children[i], parent_node.children[i - 1] = parent_node.children[i - 1], parent_node.children[i]
+            if i == len(parent_node.children) - 1: return # at bottom
+            parent_node.children[i], parent_node.children[i + 1] = parent_node.children[i + 1], parent_node.children[i]
+
             self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
+            self.listbox.set_focus_to_node(this_node)
+
+        elif key in ["meta up", "ctrl up"]:
+            # todo move folders
+            # todo save
+            i = parent_node.children.index(this_node)
+            if i == 0: return # at top
+            parent_node.children[i], parent_node.children[i - 1] = parent_node.children[i - 1], parent_node.children[i]
+
+            self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
+            self.listbox.set_focus_to_node(this_node)
         else:
             return key
 
