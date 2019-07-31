@@ -1,4 +1,5 @@
 import os
+import signal
 
 import urwid
 from redial.config import Config
@@ -138,12 +139,18 @@ class RedialApplication:
 
 
 def run():
+    signal.signal(signal.SIGINT, sigint_handler)
+
     app = RedialApplication()
     app.run()
 
     # TODO restart application after connection closes
     if app.command:
         os.system(app.command)
+
+
+def sigint_handler(signum, frame):
+    raise urwid.ExitMainLoop()
 
 
 if __name__ == "__main__":
