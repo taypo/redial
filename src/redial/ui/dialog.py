@@ -6,9 +6,7 @@ from redial.tree.node import Node
 
 class AddHostDialog:
 
-    def __init__(self, state, parent: Node, target: Node, on_close):
-        self.loop = state.loop
-        self.config = state.config
+    def __init__(self, parent: Node, target: Node, on_close):
         self.parent = parent
         self.target = target
         self.on_close = on_close
@@ -19,7 +17,7 @@ class AddHostDialog:
         self.username = urwid.Edit("Username: ", target.hostinfo.username)
         self.port = urwid.Edit("Port: ", target.hostinfo.port if self.target.name else "22")
 
-    def show(self):
+    def show(self, loop):
         # Header
         header_text = urwid.Text('Edit Connection' if self.target.name else "Add Connection", align='center')
         header = urwid.AttrMap(header_text, 'dialog')
@@ -43,19 +41,19 @@ class AddHostDialog:
             header=header)
 
         w = DialogOverlay(
-            on_close=self.on_close,
+            on_close=lambda: self.on_close(self.parent),
             on_enter=self.on_save,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
-    def on_save(self):
+    def on_save(self, args=None):
         host_info = HostInfo(self.connection_name.edit_text)
         host_info.ip = self.ip.edit_text
         host_info.port = self.port.edit_text
@@ -64,26 +62,24 @@ class AddHostDialog:
         self.target.name = self.connection_name.edit_text
         self.target.hostinfo = host_info
 
-        self.config.add_node(self.parent, self.target)
+        self.parent.add_child(self.target)
 
-        self.on_close()
+        self.on_close(self.target)
 
     def on_cancel(self, args):
-        self.on_close()
+        self.on_close(self.parent)
 
 
 class RemoveHostDialog:
 
-    def __init__(self, state, parent: Node, node: Node, on_close):
-        self.loop = state.loop
-        self.config = state.config
+    def __init__(self, parent: Node, target: Node, on_close):
         self.parent = parent
-        self.node = node
+        self.target = target
         self.on_close = on_close
 
-    def show(self):
+    def show(self, loop):
         # Header
-        header_text = urwid.Text('Remove Connection: ' + self.node.name, align='center')
+        header_text = urwid.Text('Remove Connection: ' + self.target.name, align='center')
         header = urwid.AttrMap(header_text, 'dialog')
 
         # Footer
@@ -110,32 +106,29 @@ class RemoveHostDialog:
         )
 
         w = DialogOverlay(
-            on_close=self.on_close,
-            on_enter=self.on_ok,
+            on_close=lambda: self.on_close(self.target),
+            on_enter=lambda: self.on_ok(None),
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
-    def on_ok(self):
-        self.config.delete_node(self.parent, self.node)
-        self.on_close()
+    def on_ok(self, args):
+        self.parent.remove_child(self.target)
+        self.on_close(self.parent)
 
     def on_cancel(self, args):
-        self.on_close()
+        self.on_close(self.target)
 
 
 class AddFolderDialog:
 
-    def __init__(self, state, parent: Node, target: Node, on_close):
-        self.main_widget = state.loop.widget
-        self.loop = state.loop
-        self.config = state.config
+    def __init__(self, parent: Node, target: Node, on_close):
         self.parent = parent
         self.target = target
         self.on_close = on_close
@@ -143,7 +136,7 @@ class AddFolderDialog:
         # Form Fields
         self.folder_name = urwid.Edit("Folder Name: ", target.name)
 
-    def show(self):
+    def show(self, loop):
         # Header
         header_text = urwid.Text('Edit Folder' if self.target.name else "Add Folder", align='center')
         header = urwid.AttrMap(header_text, 'dialog')
@@ -167,36 +160,35 @@ class AddFolderDialog:
             header=header)
 
         w = DialogOverlay(
-            on_close=self.on_close,
+            on_close=lambda: self.on_close(self.target),
             on_enter=self.on_save,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
-    def on_save(self):
+    def on_save(self, args=None):
         self.target.name = self.folder_name.edit_text
-        self.config.add_node(self.parent, self.target)
-        self.on_close()
+        self.parent.add_child(self.target)
+        self.on_close(self.target)
 
     def on_cancel(self, args):
-        self.on_close()
+        self.on_close(self.parent)
 
 
 class MessageDialog:
 
-    def __init__(self, state, title, message, on_close):
-        self.loop = state.loop
+    def __init__(self, title, message, on_close):
         self.title = title
         self.message = message
         self.on_close = on_close
 
-    def show(self):
+    def show(self, loop):
         # Header
         header_text = urwid.Text(self.title, align='center')
         header = urwid.AttrMap(header_text, 'dialog')
@@ -225,16 +217,16 @@ class MessageDialog:
             on_close=self.on_close,
             on_enter=self.on_ok,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
-    def on_ok(self):
+    def on_ok(self, args=None):
         self.on_close()
 
 
@@ -252,7 +244,6 @@ class DialogOverlay(urwid.Overlay):
             key = 'down'
         elif key == 'esc':
             self.on_close()
-        elif key == 'enter':
-            self.on_enter()
+        # TODO: implement, save with "enter"
 
         super().keypress(size, key)
