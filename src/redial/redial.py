@@ -12,6 +12,8 @@ from redial.ui.palette import palette
 from redial.utils import package_available
 
 
+EXIT_REDIAL = "__EXIT__"
+
 def on_focus_change(listbox):
     State.focused = listbox.get_focus()[0]
 
@@ -51,6 +53,7 @@ class RedialApplication:
         parent_node = None if w.get_node().get_parent() is None else w.get_node().get_parent().get_value()
 
         if key in 'qQ':
+            self.command = EXIT_REDIAL
             raise urwid.ExitMainLoop()
 
         elif key == "enter":
@@ -142,11 +145,15 @@ def run():
     signal.signal(signal.SIGINT, sigint_handler)
 
     app = RedialApplication()
-    app.run()
 
-    # TODO restart application after connection closes
-    if app.command:
-        os.system(app.command)
+    while True:
+        app.run()
+
+        if app.command:
+            if app.command == EXIT_REDIAL:
+                break
+            else:
+                os.system(app.command)
 
 
 def sigint_handler(signum, frame):
