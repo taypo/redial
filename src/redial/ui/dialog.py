@@ -53,7 +53,7 @@ class AddHostDialog:
 
         loop.widget = w
 
-    def on_save(self):
+    def on_save(self, args=None):
         host_info = HostInfo(self.connection_name.edit_text)
         host_info.ip = self.ip.edit_text
         host_info.port = self.port.edit_text
@@ -107,7 +107,7 @@ class RemoveHostDialog:
 
         w = DialogOverlay(
             on_close=lambda: self.on_close(self.target),
-            on_enter=self.on_ok,
+            on_enter=lambda: self.on_ok(None),
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             bottom_w=loop.widget,
             align='center',
@@ -163,7 +163,7 @@ class AddFolderDialog:
             on_close=lambda: self.on_close(self.target),
             on_enter=self.on_save,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
@@ -172,7 +172,7 @@ class AddFolderDialog:
 
         loop.widget = w
 
-    def on_save(self):
+    def on_save(self, args=None):
         self.target.name = self.folder_name.edit_text
         self.parent.add_child(self.target)
         self.on_close(self.target)
@@ -226,7 +226,7 @@ class MessageDialog:
 
         loop.widget = w
 
-    def on_ok(self):
+    def on_ok(self, args=None):
         self.on_close()
 
 
