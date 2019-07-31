@@ -244,7 +244,6 @@ class DialogOverlay(urwid.Overlay):
             key = 'down'
         elif key == 'esc':
             self.on_close()
-        elif key == 'enter':
-            self.on_enter()
+        # TODO: implement, save with "enter"
 
         super().keypress(size, key)
