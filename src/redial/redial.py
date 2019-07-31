@@ -132,7 +132,8 @@ def run():
             if app.command == EXIT_REDIAL:
                 break
             else:
-                os.system(app.command)
+                if os.system(app.command) != 0:
+                    break
 
 
 def sigint_handler(app, signum, frame):
