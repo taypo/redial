@@ -6,9 +6,13 @@ from redial.hostinfo import HostInfo
 from redial.tree.node import Node
 from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog
 from redial.ui.footer import FooterButton
-from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox
+from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
 from redial.utils import package_available
+
+
+def on_focus_change(listbox):
+    State.focused = listbox.get_focus()[0]
 
 
 class RedialApplication:
@@ -18,6 +22,7 @@ class RedialApplication:
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
+        urwid.connect_signal(self.walker, "modified", lambda: on_focus_change(self.listbox))
         header = urwid.Text("Redial")
         footer = self.init_footer()
 

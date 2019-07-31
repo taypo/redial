@@ -1,10 +1,15 @@
-import os
-
 import urwid
 from redial.tree.node import Node
 
 
+# TODO get rid of this if possible
+class State:
+    focused = None
+
+
 class UITreeWidget(urwid.TreeWidget):
+    indent_cols = 4
+
     def __init__(self, node):
         self.__super.__init__(node)
         self.key_handler = node.key_handler
@@ -12,7 +17,10 @@ class UITreeWidget(urwid.TreeWidget):
         self._w = urwid.AttrWrap(self._w, node.get_value().nodetype, node.get_value().nodetype + "_focus")
 
     def get_display_text(self):
-        return self.get_node().get_value().name
+        if State.focused and State.focused.get_node() == self.get_node():
+            return self.get_node().get_value().name + " " + self.get_node().get_value().hostinfo.ip
+        else:
+            return self.get_node().get_value().name
 
     def selectable(self):
         return True
@@ -43,6 +51,13 @@ class UITreeNode(urwid.TreeNode):
 
     def load_widget(self):
         return UITreeWidget(self)
+
+    """
+        This is done to show IP address for connection on focus.
+        Doesn't seem to be efficient. 
+    """
+    def get_widget(self, reload=False):
+        return super().get_widget(True)
 
 
 class UIParentNode(urwid.ParentNode):
