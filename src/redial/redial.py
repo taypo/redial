@@ -39,8 +39,10 @@ class RedialApplication:
 
     def on_key_press(self, key: str, w: UITreeWidget):
         this_node = w.get_node().get_value()
-        parent_node = this_node if (w.get_node().get_parent() is None or this_node.nodetype == "folder") \
+        folder_node = this_node if (w.get_node().get_parent() is None or this_node.nodetype == "folder") \
             else w.get_node().get_parent().get_value()
+
+        parent_node = None if w.get_node().get_parent() is None else w.get_node().get_parent().get_value()
 
         if key in 'qQ':
             raise urwid.ExitMainLoop()
@@ -49,22 +51,22 @@ class RedialApplication:
                 self.command = w.get_node().get_value().hostinfo.get_ssh_command()
                 raise urwid.ExitMainLoop()
         elif key == "f7":
-            AddHostDialog(parent_node, Node("", "session", HostInfo("")), self.save_and_reload).show(self.loop)
+            AddHostDialog(folder_node, Node("", "session", HostInfo("")), self.save_and_reload).show(self.loop)
         elif key in ["meta down", "ctrl down"]:
-            # todo move folders
             # todo save
+            if parent_node is None: return
             i = parent_node.children.index(this_node)
-            if i == len(parent_node.children) - 1: return # at bottom
+            if i == len(parent_node.children) - 1: return  # at bottom
             parent_node.children[i], parent_node.children[i + 1] = parent_node.children[i + 1], parent_node.children[i]
 
             self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
             self.listbox.set_focus_to_node(this_node)
 
         elif key in ["meta up", "ctrl up"]:
-            # todo move folders
             # todo save
+            if parent_node is None: return
             i = parent_node.children.index(this_node)
-            if i == 0: return # at top
+            if i == 0: return  # at top
             parent_node.children[i], parent_node.children[i - 1] = parent_node.children[i - 1], parent_node.children[i]
 
             self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
