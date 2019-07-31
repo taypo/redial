@@ -4,7 +4,7 @@ import urwid
 from redial.config import Config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-from redial.ui.dialog import AddHostDialog, MessageDialog
+from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog
 from redial.ui.footer import FooterButton
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox
 from redial.ui.palette import palette
@@ -60,8 +60,18 @@ class RedialApplication:
                 MessageDialog("Error", "Please install mc (Midnight Commander) package"
                                        " to use this feature", self.close_dialog).show(self.loop)
 
+        elif key == "f6":
+            AddFolderDialog(folder_node, Node("", "folder"), self.save_and_focus).show(self.loop)
+
         elif key == "f7":
             AddHostDialog(folder_node, Node("", "session", HostInfo("")), self.save_and_focus).show(self.loop)
+
+        elif key == "f8":
+            if this_node.nodetype == "folder":
+                # TODO implement removing folder
+                MessageDialog("Error", "Folders can not be removed", self.close_dialog).show(self.loop)
+            else:
+                RemoveHostDialog(parent_node, this_node, self.save_and_focus).show(self.loop)
 
         elif key in ["meta down", "ctrl down"]:
             if parent_node is None: return

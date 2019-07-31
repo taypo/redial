@@ -71,16 +71,14 @@ class AddHostDialog:
 
 class RemoveHostDialog:
 
-    def __init__(self, state, parent: Node, node: Node, on_close):
-        self.loop = state.loop
-        self.config = state.config
+    def __init__(self, parent: Node, target: Node, on_close):
         self.parent = parent
-        self.node = node
+        self.target = target
         self.on_close = on_close
 
-    def show(self):
+    def show(self, loop):
         # Header
-        header_text = urwid.Text('Remove Connection: ' + self.node.name, align='center')
+        header_text = urwid.Text('Remove Connection: ' + self.target.name, align='center')
         header = urwid.AttrMap(header_text, 'dialog')
 
         # Footer
@@ -107,31 +105,28 @@ class RemoveHostDialog:
         )
 
         w = DialogOverlay(
-            on_close=self.on_close,
+            on_close=lambda: self.on_close(self.target),
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            bottom_w=self.loop.widget,
+            bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
     def on_ok(self, args):
-        self.config.delete_node(self.parent, self.node)
-        self.on_close()
+        self.parent.remove_child(self.target)
+        self.on_close(self.parent)
 
     def on_cancel(self, args):
-        self.on_close()
+        self.on_close(self.target)
 
 
 class AddFolderDialog:
 
-    def __init__(self, state, parent: Node, target: Node, on_close):
-        self.main_widget = state.loop.widget
-        self.loop = state.loop
-        self.config = state.config
+    def __init__(self, parent: Node, target: Node, on_close):
         self.parent = parent
         self.target = target
         self.on_close = on_close
@@ -139,7 +134,7 @@ class AddFolderDialog:
         # Form Fields
         self.folder_name = urwid.Edit("Folder Name: ", target.name)
 
-    def show(self):
+    def show(self, loop):
         # Header
         header_text = urwid.Text('Edit Folder' if self.target.name else "Add Folder", align='center')
         header = urwid.AttrMap(header_text, 'dialog')
@@ -164,22 +159,22 @@ class AddFolderDialog:
 
         w = urwid.Overlay(
             urwid.AttrMap(urwid.LineBox(layout), "dialog"),
-            self.loop.widget,
+            loop.widget,
             align='center',
             width=40,
             valign='middle',
             height=10
         )
 
-        self.loop.widget = w
+        loop.widget = w
 
     def on_save(self, args):
         self.target.name = self.folder_name.edit_text
-        self.config.add_node(self.parent, self.target)
-        self.on_close()
+        self.parent.add_child(self.target)
+        self.on_close(self.target)
 
     def on_cancel(self, args):
-        self.on_close()
+        self.on_close(self.parent)
 
 
 class MessageDialog:
