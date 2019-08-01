@@ -11,7 +11,7 @@ You can install it with pip.
 Features
 - [x] Manage your connections in folders/groups
 - [x] Open a file manager to your remote host (Midnight Commander should be installed)
-- [ ] Edit/Move/Delete connection
+- [x] Edit/Move/Delete connection
 - [ ] Copy SSH Key to remote host
 
 More features coming soon..
