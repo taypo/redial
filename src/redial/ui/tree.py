@@ -26,7 +26,14 @@ class UITreeWidget(urwid.TreeWidget):
         return True
 
     def keypress(self, size, key):
-        return self.key_handler(key, self)
+        if key in ("-", "left") and not self.is_leaf:
+            self.expanded = False
+            self.update_expanded_icon()
+        elif key in ("+", "right") and not self.is_leaf:
+            self.expanded = True
+            self.update_expanded_icon()
+        else:
+            return self.key_handler(key, self)
 
 
 class UITreeListBox(urwid.TreeListBox):
@@ -40,6 +47,19 @@ class UITreeListBox(urwid.TreeListBox):
                 self.set_focus(n)
                 return
             start = n
+
+    def keypress(self, size, key):
+        if key == "left":
+            widget, pos = self.body.get_focus()
+            self.keypress(size, "-")
+            parent_widget, parent_pos = self.body.get_focus()
+
+            if pos == parent_pos and size[1] > 2:
+                self.move_focus_to_parent(size)
+
+        else:
+            if key not in ['home', 'end']:
+                self.__super.keypress(size, key)
 
 
 class UITreeNode(urwid.TreeNode):
