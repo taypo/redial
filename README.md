@@ -9,7 +9,7 @@ You can install it with pip.
 `pip3 install redial` 
 
 
-<p align="center"><img src="/gifs/add_folder.gif"/></p>
+![](/gifs/add_folder.gif)
 
 Features
 - [x] Manage your connections in folders/groups
