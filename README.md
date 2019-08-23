@@ -2,6 +2,7 @@
 
 [![Build Status](https://img.shields.io/pypi/pyversions/redial.svg)](https://pypi.org/project/redial/)
 [![License](https://img.shields.io/github/license/taypo/redial)](LICENSE)
+[![Version](https://img.shields.io/pypi/v/redial)](https://pypi.org/project/redial/)
 
 redial is a simple shell application that manages your SSH sessions.
 
