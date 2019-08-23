@@ -40,10 +40,16 @@ More features coming soon..
 
 ### Add Folder
 
+Type `F6` or click `F6 New Folder` to add a folder. There must be at least
+one connection under the folder. 
+
 ![add_folder_gif](/gifs/add_folder.gif)
 
+### Add Connection
 
+Type `F7` or click `F7 New Conn.` to add a ssh connection. 
 
+![add_folder_gif](/gifs/add_connection.gif)
 
 ## License
 
