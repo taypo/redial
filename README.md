@@ -38,49 +38,49 @@ pip3 install git+https://github.com/taypo/redial.git
 
 More features coming soon..
 
-### Connect to SSH Session
+### Connect to SSH Session (ENTER)
 
 Press `ENTER` to connect a SSH session.
 
-### Connect (ENTER)
+![connect_gif](/doc/connect.gif)
 
 ### Add Folder (F6)
 
 Press `F6` or click `F6 New Folder` to add a folder. There must be at least
 one connection under the folder. 
 
-![add_folder_gif](/gifs/add_folder.gif)
+![add_folder_gif](/doc/add_folder.gif)
 
 ### Add Connection (F7)
 
 Press `F7` or click `F7 New Conn.` to add a ssh connection. 
 
-![add_conn_gif](/gifs/add_connection.gif)
+![add_conn_gif](/doc/add_connection.gif)
 
 ### Browse over mc (F5)
 
 Press `F5` or click `F5 Browse` to open mc (Midnight Commander) session. 
 
-![mc_gif](/gifs/mc.gif)
+![mc_gif](/doc/mc.gif)
 
 ### Remove Connection (F8)
 
 Press `F8` or click `F8 Remove` to edit a session. 
 
-![edit_gif](/gifs/remove.gif)
+![remove_gif](/doc/remove.gif)
 
 ### Edit Connection (F9)
 
 Press `F9` or click `F9 Edit` to edit a session. 
 
-![edit_gif](/gifs/edit.gif)
+![edit_gif](/doc/edit.gif)
 
 
 ### Move sessions and folders
 
 Press `CTRL` and `up/down` keys to move session or folder.
 
-![move_gif](/gifs/move.gif)
+![move_gif](/doc/move.gif)
 
 ## License
 
