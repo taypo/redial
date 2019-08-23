@@ -82,7 +82,7 @@ Press `F9` or click `F9 Edit` to edit a session.
 
 ### Move sessions and folders
 
-Press `CTRL` and `up/down` keys to move session or folder.
+Press `CTRL` and `up/down` keys to move session or folder. **For macOS users:** Use `ALT` and `up/down` keys.
 
 ![move_gif](/doc/move.gif)
 
@@ -95,6 +95,13 @@ SSH config file with the following way (Make sure that `~/.ssh/config file exist
 ```bash
 sed -i -e '1iInclude ~/.config/redial/sessions' ~/.ssh/config
 ```
+
+## Platforms
+
+- Linux
+- macOS
+
+Windows is currently not supported.
 
 ## License
 
