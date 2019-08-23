@@ -38,18 +38,24 @@ pip3 install git+https://github.com/taypo/redial.git
 
 More features coming soon..
 
-### Add Folder
+### Add Folder (F6)
 
 Type `F6` or click `F6 New Folder` to add a folder. There must be at least
 one connection under the folder. 
 
 ![add_folder_gif](/gifs/add_folder.gif)
 
-### Add Connection
+### Add Connection (F7)
 
 Type `F7` or click `F7 New Conn.` to add a ssh connection. 
 
-![add_folder_gif](/gifs/add_connection.gif)
+![add_conn_gif](/gifs/add_connection.gif)
+
+### Add Connection (F5)
+
+Type `F5` or click `F5 Browse` to open mc (Midnight Commander) session. 
+
+![mc_gif](/gifs/mc.gif)
 
 ## License
 
