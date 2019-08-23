@@ -51,7 +51,7 @@ Type `F7` or click `F7 New Conn.` to add a ssh connection.
 
 ![add_conn_gif](/gifs/add_connection.gif)
 
-### Add Connection (F5)
+### Browse over mc (F5)
 
 Type `F5` or click `F5 Browse` to open mc (Midnight Commander) session. 
 
