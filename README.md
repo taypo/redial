@@ -34,6 +34,22 @@ You can install the latest version from Git:
 pip3 install git+https://github.com/taypo/redial.git
 ```
 
+### Docker
+
+[Dockerfile](Dockerfile) is provided. 
+
+#### Build Dockerfile:
+
+```bash
+docker build -t redial .
+```
+
+#### Run redial in Docker Container
+
+```bash
+docker run -it --rm redial:latest redial
+```
+
 ## Features
 - [x] Manage your connections in folders/groups
 - [x] Open a file manager to your remote host (Midnight Commander should be installed)
