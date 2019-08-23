@@ -8,6 +8,9 @@ You can install it with pip.
 
 `pip3 install redial` 
 
+
+<p align="center"><img src="/gifs/render1566583439156.gif?raw=true"/></p>
+
 Features
 - [x] Manage your connections in folders/groups
 - [x] Open a file manager to your remote host (Midnight Commander should be installed)
