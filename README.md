@@ -63,6 +63,12 @@ Press `F5` or click `F5 Browse` to open mc (Midnight Commander) session.
 
 ![mc_gif](/gifs/mc.gif)
 
+### Remove Connection (F8)
+
+Press `F8` or click `F8 Remove` to edit a session. 
+
+![edit_gif](/gifs/remove.gif)
+
 ### Edit Connection (F9)
 
 Press `F9` or click `F9 Edit` to edit a session. 
