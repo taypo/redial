@@ -57,6 +57,13 @@ Type `F5` or click `F5 Browse` to open mc (Midnight Commander) session.
 
 ![mc_gif](/gifs/mc.gif)
 
+
+### Move sessions and folders
+
+Press CTRL and up/down keys to move session or folder.
+
+![move_gif](/gifs/move.gif)
+
 ## License
 
 redial is licensed under the [GNU General Public License v3.0](LICENSE).
