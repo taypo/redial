@@ -12,7 +12,7 @@ redial is a simple shell application that manages your SSH sessions.
 
 ### Requirements
 - Python 3 or later to run redial.
-- [mc (Midnight Commadder)](https://midnight-commander.org/) to use `F5 (Browse)` feature.
+- [mc (Midnight Commander)](https://midnight-commander.org/) to use `F5 (Browse)` feature.
 
 ### Stable Version
 
