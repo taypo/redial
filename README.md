@@ -86,6 +86,16 @@ Press `CTRL` and `up/down` keys to move session or folder.
 
 ![move_gif](/doc/move.gif)
 
+## Notes
+
+Configuration file is stored in `~/.config/redial/sessions`. File format
+is same as the SSH `config` file. Configuration file can be included in
+SSH config file with the following way (Make sure that `~/.ssh/config file exists`): 
+
+```bash
+sed -i -e '1iInclude ~/.config/redial/sessions' ~/.ssh/config
+```
+
 ## License
 
 redial is licensed under the [GNU General Public License v3.0](LICENSE).
