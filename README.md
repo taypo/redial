@@ -85,7 +85,7 @@ Press `F5` or click `F5 Browse` to open mc (Midnight Commander) session.
 
 ### Remove Connection (F8)
 
-Press `F8` or click `F8 Remove` to edit a session. 
+Press `F8` or click `F8 Remove` to remove a session. 
 
 ![remove_gif](/doc/remove.gif)
 
