@@ -105,7 +105,7 @@ Press `CTRL` and `up/down` keys to move session or folder. **For macOS users:** 
 ## Notes
 
 Configuration file is stored in `~/.config/redial/sessions`. File format
-is same as the SSH `config` file. Configuration file can be included in
+is same as the [SSH config](https://man.openbsd.org/ssh_config) file. Configuration file can be included in
 SSH config file with the following way (Make sure that `~/.ssh/config` file exists): 
 
 ```bash
