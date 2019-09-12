@@ -18,6 +18,7 @@ class FooterButton(urwid.Button):
 
 def init_footer(listbox):
     connect_button = FooterButton(u"\u23ce", "Connect", "enter", lambda button: button.on_click(listbox.get_focus()))
+    sshkey_button = FooterButton("F3", "Copy SSH Key", "f3", lambda button: button.on_click(listbox.get_focus()))
     mc_button = FooterButton("F5", "Browse", "f5", lambda button: button.on_click(listbox.get_focus()))
     add_folder_button = FooterButton("F6", "New Folder", "f6", lambda button: button.on_click(listbox.get_focus()))
     add_button = FooterButton("F7", "New Conn.", "f7", lambda button: button.on_click(listbox.get_focus()))
@@ -27,6 +28,7 @@ def init_footer(listbox):
     # TODO keys that dont depend on selected node should be handled differently
 
     return urwid.GridFlow([connect_button,
+                           sshkey_button,
                            mc_button,
                            # TODO join add buttons to one
                            add_folder_button,
