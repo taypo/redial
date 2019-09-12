@@ -12,6 +12,7 @@ from redial.ui.palette import palette
 from redial.utils import package_available
 from functools import partial
 
+from src.redial.ui.dialog import CopySSHKeyDialog
 
 EXIT_REDIAL = "__EXIT__"
 
@@ -62,6 +63,9 @@ class RedialApplication:
             if isinstance(w.get_node(), UITreeNode):
                 self.command = w.get_node().get_value().hostinfo.get_ssh_command()
                 raise urwid.ExitMainLoop()
+
+        elif key == "f3" and w.is_leaf:
+            CopySSHKeyDialog(this_node, self.close_dialog).show(self.loop)
 
         elif key == "f5" and w.is_leaf:
             if package_available(package_name="mc"):
@@ -115,7 +119,10 @@ class RedialApplication:
         self.listbox.set_focus_to_node(focus)
         self.loop.widget = self.view
 
-    def close_dialog(self):
+    def close_dialog(self, command=None):
+        if command is not None:
+            self.command = command
+            raise urwid.ExitMainLoop()
         self.loop.widget = self.view
 
 
