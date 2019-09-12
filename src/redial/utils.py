@@ -1,4 +1,7 @@
+import glob
+import os
 import shutil
+from os.path import expanduser
 
 
 def package_available(package_name):
@@ -10,3 +13,14 @@ def package_available(package_name):
     """
 
     return True if shutil.which(package_name) is not None else False
+
+
+def get_public_ssh_keys():
+    """
+    Gets public (pub) ssh keys from ~/.ssh directory
+    :return: list of public key paths
+    """
+    home = expanduser("~")
+    path = os.path.join(home, '.ssh/')
+    files = [f for f in glob.glob(path + "**/*.pub", recursive=True)]
+    return files
