@@ -1,7 +1,12 @@
+import os
+
 import urwid
 
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
+from urwid.tests.util import SelectableText
+
+from redial.utils import get_public_ssh_keys
 
 
 class AddHostDialog:
@@ -179,6 +184,80 @@ class AddFolderDialog:
 
     def on_cancel(self, args):
         self.on_close(self.parent)
+
+
+class SSHListBox(urwid.ListBox):
+    def __init__(self, on_enter, **kwargs):
+        self.on_enter = on_enter
+        super(SSHListBox, self).__init__(**kwargs)
+
+    def keypress(self, size, key):
+        if key == "enter":
+            self.on_enter()
+        else:
+            return super(SSHListBox, self).keypress(size, key)
+
+
+class CopySSHKeyDialog:
+
+    def __init__(self, target: Node, on_close):
+        self.target = target
+        self.on_close = on_close
+
+        # Form Fields
+        self.ssh_keys_walker = urwid.SimpleListWalker(
+            self.prepare_ssh_list_elements()
+        )
+
+    def show(self, loop):
+        # Header
+        header_text = urwid.Text('Select Public SSH Key to Copy', align='center')
+        header = urwid.AttrMap(header_text, 'dialog')
+
+        cancel_btn = urwid.Button('Cancel', self.on_cancel)
+        cancel_btn = urwid.AttrWrap(cancel_btn, 'dialog_button', 'dialog_button_focus')
+
+        footer = urwid.GridFlow([cancel_btn], 12, 1, 1, 'center')
+
+        list_box = urwid.BoxAdapter(SSHListBox(on_enter=self.on_copy, body=self.ssh_keys_walker), 5)
+
+        body = urwid.Filler(
+            urwid.Pile([list_box, footer])
+        )
+
+        # Layout
+        layout = urwid.Frame(
+            body=body,
+            header=header)
+
+        layout = urwid.AttrWrap(layout, 'dialog')
+
+        w = DialogOverlay(
+            on_close=lambda: self.on_close(self.target),
+            on_enter=self.on_copy,
+            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            bottom_w=loop.widget,
+            align='center',
+            width=40,
+            valign='middle',
+            height=10
+        )
+
+        loop.widget = w
+
+    def on_copy(self, args=None):
+        selected_ssh_key = self.ssh_keys_walker.get_focus()[0].original_widget.text
+        command = self.target.hostinfo.get_ssh_copy_command(selected_ssh_key)
+        self.on_close(command)
+
+    def on_cancel(self, args):
+        self.on_close()
+
+    def prepare_ssh_list_elements(self):
+        ssh_keys = []
+        for key in get_public_ssh_keys():
+            ssh_keys.append(urwid.AttrWrap(SelectableText(key), 'ssh_copy', 'ssh_copy_focus'))
+        return ssh_keys
 
 
 class MessageDialog:
