@@ -5,14 +5,12 @@ import urwid
 from redial.config import Config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog
+from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog, CopySSHKeyDialog
 from redial.ui.footer import init_footer
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
-from redial.utils import package_available
+from redial.utils import package_available, get_public_ssh_keys
 from functools import partial
-
-from src.redial.ui.dialog import CopySSHKeyDialog
 
 EXIT_REDIAL = "__EXIT__"
 
@@ -70,8 +68,15 @@ class RedialApplication:
                 raise urwid.ExitMainLoop()
 
         elif key == "f3" and w.is_leaf:
-            self.log = "SSH key is copied successfully"
-            CopySSHKeyDialog(this_node, self.close_dialog_and_run).show(self.loop)
+            if (len(get_public_ssh_keys())) == 0:
+                MessageDialog("Error",
+                              "There is no public SSH Key (.pub) in ~/.ssh folder. You can use ssh-keygen to "
+                              "generate SSH key pairs",
+                              self.close_dialog).show(
+                    self.loop)
+            else:
+                self.log = "SSH key is copied successfully"
+                CopySSHKeyDialog(this_node, self.close_dialog_and_run).show(self.loop)
 
         elif key == "f5" and w.is_leaf:
             if package_available(package_name="mc"):
