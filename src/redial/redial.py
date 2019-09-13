@@ -44,8 +44,13 @@ class RedialApplication:
 
         # instance attributes
         self.command = None
+        self.command_return_key = None
+        self.log = None
 
     def run(self):
+        if self.command_return_key == 0 and self.log is not None:
+            MessageDialog("Info", self.log, self.close_dialog).show(self.loop)
+            self.log = None
         self.loop.run()
 
     def on_key_press(self, key: str, w: UITreeWidget):
@@ -65,7 +70,8 @@ class RedialApplication:
                 raise urwid.ExitMainLoop()
 
         elif key == "f3" and w.is_leaf:
-            CopySSHKeyDialog(this_node, self.close_dialog).show(self.loop)
+            self.log = "SSH key is copied successfully"
+            CopySSHKeyDialog(this_node, self.close_dialog_and_run).show(self.loop)
 
         elif key == "f5" and w.is_leaf:
             if package_available(package_name="mc"):
@@ -119,15 +125,19 @@ class RedialApplication:
         self.listbox.set_focus_to_node(focus)
         self.loop.widget = self.view
 
-    def close_dialog(self, command=None):
+    def close_dialog(self):
+        self.loop.widget = self.view
+
+    def close_dialog_and_run(self, command=None):
         if command is not None:
             self.command = command
+            self.loop.widget = self.view
             raise urwid.ExitMainLoop()
-        self.loop.widget = self.view
+        else:
+            self.loop.widget = self.view
 
 
 def run():
-
     app = RedialApplication()
 
     signal.signal(signal.SIGINT, partial(sigint_handler, app))
@@ -139,8 +149,12 @@ def run():
             if app.command == EXIT_REDIAL:
                 break
             else:
-                if os.system(app.command) != 0:
+                rk = os.system(app.command)
+                if rk != 0:
+                    app.command_return_key = rk
                     break
+                else:
+                    app.command_return_key = 0
 
 
 def sigint_handler(app, signum, frame):
