@@ -1,12 +1,11 @@
 import os
+from os.path import expanduser
 
 import urwid
-
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-from urwid.tests.util import SelectableText
-
 from redial.utils import get_public_ssh_keys
+from urwid.tests.util import SelectableText
 
 
 class AddHostDialog:
@@ -246,7 +245,8 @@ class CopySSHKeyDialog:
         loop.widget = w
 
     def on_copy(self, args=None):
-        selected_ssh_key = self.ssh_keys_walker.get_focus()[0].original_widget.text
+        ssh_files_path = os.path.join(expanduser("~"), '.ssh/')
+        selected_ssh_key = os.path.join(ssh_files_path, self.ssh_keys_walker.get_focus()[0].original_widget.text)
         command = self.target.hostinfo.get_ssh_copy_command(selected_ssh_key)
         self.on_close(command)
 
