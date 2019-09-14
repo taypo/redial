@@ -256,7 +256,7 @@ class CopySSHKeyDialog:
     def prepare_ssh_list_elements(self):
         ssh_keys = []
         for key in get_public_ssh_keys():
-            ssh_keys.append(urwid.AttrWrap(SelectableText(key), 'ssh_copy', 'ssh_copy_focus'))
+            ssh_keys.append(urwid.AttrWrap(SelectableText(os.path.basename(key)), 'ssh_copy', 'ssh_copy_focus'))
         return ssh_keys
 
 
