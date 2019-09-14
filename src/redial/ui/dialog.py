@@ -232,7 +232,7 @@ class CopySSHKeyDialog:
         layout = urwid.AttrWrap(layout, 'dialog')
 
         w = DialogOverlay(
-            on_close=lambda: self.on_close(self.target),
+            on_close=lambda: self.on_close(),
             on_enter=self.on_copy,
             top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
             bottom_w=loop.widget,
