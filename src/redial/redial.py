@@ -5,13 +5,12 @@ import urwid
 from redial.config import Config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog
+from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog, CopySSHKeyDialog
 from redial.ui.footer import init_footer
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
-from redial.utils import package_available
+from redial.utils import package_available, get_public_ssh_keys
 from functools import partial
-
 
 EXIT_REDIAL = "__EXIT__"
 
@@ -43,8 +42,13 @@ class RedialApplication:
 
         # instance attributes
         self.command = None
+        self.command_return_key = None
+        self.log = None
 
     def run(self):
+        if self.command_return_key == 0 and self.log is not None:
+            MessageDialog("Info", self.log, self.close_dialog).show(self.loop)
+            self.log = None
         self.loop.run()
 
     def on_key_press(self, key: str, w: UITreeWidget):
@@ -62,6 +66,17 @@ class RedialApplication:
             if isinstance(w.get_node(), UITreeNode):
                 self.command = w.get_node().get_value().hostinfo.get_ssh_command()
                 raise urwid.ExitMainLoop()
+
+        elif key == "f3" and w.is_leaf:
+            if (len(get_public_ssh_keys())) == 0:
+                MessageDialog("Error",
+                              "There is no public SSH Key (.pub) in ~/.ssh folder. You can use ssh-keygen to "
+                              "generate SSH key pairs",
+                              self.close_dialog).show(
+                    self.loop)
+            else:
+                self.log = "SSH key is copied successfully"
+                CopySSHKeyDialog(this_node, self.close_dialog_and_run).show(self.loop)
 
         elif key == "f5" and w.is_leaf:
             if package_available(package_name="mc"):
@@ -118,9 +133,16 @@ class RedialApplication:
     def close_dialog(self):
         self.loop.widget = self.view
 
+    def close_dialog_and_run(self, command=None):
+        if command is not None:
+            self.command = command
+            self.loop.widget = self.view
+            raise urwid.ExitMainLoop()
+        else:
+            self.loop.widget = self.view
+
 
 def run():
-
     app = RedialApplication()
 
     signal.signal(signal.SIGINT, partial(sigint_handler, app))
@@ -132,8 +154,12 @@ def run():
             if app.command == EXIT_REDIAL:
                 break
             else:
-                if os.system(app.command) != 0:
+                rk = os.system(app.command)
+                if rk != 0:
+                    app.command_return_key = rk
                     break
+                else:
+                    app.command_return_key = 0
 
 
 def sigint_handler(app, signum, frame):
