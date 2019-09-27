@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/taypo/redial)](LICENSE)
 [![Version](https://img.shields.io/pypi/v/redial)](https://pypi.org/project/redial/)
 
-redial is a simple shell application that manages your SSH sessions.
+redial is a simple shell application that manages your SSH sessions on Unix terminal.
 
 ![redial](https://github.com/taypo/redial/blob/master/doc/redial.png?raw=true)
 
