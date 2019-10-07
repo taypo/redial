@@ -58,7 +58,7 @@ class RedialApplication:
 
         parent_node = None if w.get_node().get_parent() is None else w.get_node().get_parent().get_value()
 
-        if key in 'qQ':
+        if key in ['q', 'Q', 'ctrl d']:
             self.command = EXIT_REDIAL
             raise urwid.ExitMainLoop()
 
