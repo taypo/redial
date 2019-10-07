@@ -62,7 +62,7 @@ More features coming soon..
 
 Press `ENTER` to connect a SSH session.
 
-![connect_gif](/doc/connect.gif)
+![connect_gif](https://raw.githubusercontent.com/taypo/redial/master/doc/connect.gif)
 
 ### Add Folder (F6)
 
