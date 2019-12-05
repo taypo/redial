@@ -16,6 +16,10 @@ class AddHostDialog:
         self.parent = parent
         self.target = target
         self.on_close = on_close
+        self.show_advanced = False
+
+        self.w = None
+        self.loop = None
 
         # Form Fields
         self.connection_name = urwid.Edit("Connection Name: ", target.name)
@@ -24,47 +28,61 @@ class AddHostDialog:
         self.port = urwid.Edit("Port: ", target.hostinfo.port if self.target.name else "22")
         self.id_file = urwid.Edit("Private Key Path: ", target.hostinfo.identity_file)
 
-    def show(self, loop):
         # Header
-        header_text = urwid.Text('Edit Connection' if self.target.name else "Add Connection", align='center')
-        header = urwid.AttrMap(header_text, 'dialog')
+        self.header_text = 'Edit Connection' if self.target.name else 'Add Connection'
+
+        # Advanced
+        self.advanced_btn = urwid.AttrWrap(urwid.CheckBox('Advanced', False, False, self.on_advanced),
+                                           'dialog_button', 'dialog_button_focus')
 
         # Footer
-        save_btn = urwid.Button('Save', self.on_save)
-        save_btn = urwid.AttrWrap(save_btn, 'dialog_button', 'dialog_button_focus')
+        self.save_btn = urwid.AttrWrap(urwid.Button('Save', self.on_save),
+                                       'dialog_button', 'dialog_button_focus')
 
-        cancel_btn = urwid.Button('Cancel', self.on_cancel)
-        cancel_btn = urwid.AttrWrap(cancel_btn, 'dialog_button', 'dialog_button_focus')
+        self.cancel_btn = urwid.AttrWrap(urwid.Button('Cancel', self.on_cancel),
+                                         'dialog_button', 'dialog_button_focus')
 
-        footer = urwid.GridFlow([save_btn, cancel_btn], 12, 1, 1, 'center')
+        self.footer = urwid.GridFlow([self.save_btn, self.cancel_btn], 12, 1, 1, 'center')
 
-        body = urwid.Filler(
+        self.body = urwid.Filler(
             urwid.Pile([
                 self.connection_name,
                 self.ip,
                 self.username,
                 self.port,
-                self.id_file,
-                footer])
+                self.advanced_btn,
+                self.footer])
         )
 
-        # Layout
-        layout = urwid.Frame(
-            body,
-            header=header)
+        self.advanced_body = urwid.Filler(
+            urwid.Pile([
+                self.connection_name,
+                self.ip,
+                self.username,
+                self.port,
+                self.advanced_btn,
+                self.id_file,
+                self.footer])
+        )
 
-        w = DialogOverlay(
+    def show(self, loop):
+        self.loop = loop
+        self.w = DialogOverlay(
             on_close=lambda: self.on_close(self.parent),
             on_enter=self.on_save,
-            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            top_w=urwid.AttrMap(urwid.LineBox(self.advanced_body if self.show_advanced else self.body, self.header_text), "dialog"),
             bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
-            height=10
+            height=12
         )
 
-        loop.widget = w
+        loop.widget = self.w
+
+    def on_advanced(self, args, user_data):
+        self.show_advanced = not self.show_advanced
+        self.show(self.loop)
 
     def on_save(self, args=None):
         host_info = HostInfo(self.connection_name.edit_text)
