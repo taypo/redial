@@ -16,9 +16,8 @@ class AddHostDialog:
         self.parent = parent
         self.target = target
         self.on_close = on_close
-        self.show_advanced = False
 
-        self.w = None
+        self.show_advanced = False
         self.loop = None
 
         # Form Fields
@@ -60,25 +59,27 @@ class AddHostDialog:
                 self.ip,
                 self.username,
                 self.port,
-                self.advanced_btn,
                 self.id_file,
                 self.footer])
         )
 
     def show(self, loop):
         self.loop = loop
-        self.w = DialogOverlay(
+        w = DialogOverlay(
             on_close=lambda: self.on_close(self.parent),
             on_enter=self.on_save,
-            top_w=urwid.AttrMap(urwid.LineBox(self.advanced_body if self.show_advanced else self.body, self.header_text), "dialog"),
+            top_w=urwid.AttrMap(
+                urwid.LineBox(
+                    self.advanced_body if self.show_advanced else self.body, self.header_text),
+                "dialog"),
             bottom_w=loop.widget,
             align='center',
             width=40,
             valign='middle',
-            height=12
+            height=15 if self.show_advanced else 8
         )
 
-        loop.widget = self.w
+        loop.widget = w
 
     def on_advanced(self, args, user_data):
         self.show_advanced = not self.show_advanced
