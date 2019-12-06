@@ -31,8 +31,14 @@ class Config:
                     host_info.username = value
                 if key == "port":
                     host_info.port = value
-                if key == "identity_file":
+                if key == "identityfile":
                     host_info.identity_file = value
+                if key == "dynamicforward":
+                    host_info.dynamic_forward = value
+                if key == "localforward":
+                    host_info.local_forward = value
+                if key == "remoteforward":
+                    host_info.remote_forward = value
 
             if host_info is not None:
                 hosts.append(host_info)
@@ -73,6 +79,15 @@ class Config:
 
             if host.identity_file:
                 file.write("\tIdentityFile " + host.identity_file + "\n")
+
+            if host.dynamic_forward:
+                file.write("\tDynamicForward " + host.dynamic_forward + "\n")
+
+            if host.local_forward:
+                file.write("\tLocalForward " + host.local_forward + "\n")
+
+            if host.remote_forward:
+                file.write("\tRemoteForward " + host.remote_forward + "\n")
 
             file.write("\n")
 

@@ -6,6 +6,9 @@ class HostInfo:
     port = ""
     username = ""
     identity_file = ""
+    dynamic_forward = ""
+    local_forward = ""
+    remote_forward = ""
 
     def __init__(self, full_name):
         self.full_name = full_name
@@ -31,6 +34,9 @@ class HostInfo:
 
         if self.identity_file:
             c = c + "-i " + self.identity_file + " "
+
+        if self.dynamic_forward:
+            c = c + "-D" + self.dynamic_forward + " "
 
         if self.username:
             c = c + self.username + "@"
