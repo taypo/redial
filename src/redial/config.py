@@ -18,27 +18,26 @@ class Config:
                 kv = line.split(' ')
 
                 key = kv[0].lower()  # SSH config file keys are case insensitive
-                value = kv[1]
 
                 if key == "host":
                     if host_info is not None:
                         hosts.append(host_info)
 
-                    host_info = HostInfo(value)
+                    host_info = HostInfo(kv[1])
                 if key == "hostname":
-                    host_info.ip = value
+                    host_info.ip = kv[1]
                 if key == "user":
-                    host_info.username = value
+                    host_info.username = kv[1]
                 if key == "port":
-                    host_info.port = value
+                    host_info.port = kv[1]
                 if key == "identityfile":
-                    host_info.identity_file = value
+                    host_info.identity_file = kv[1]
                 if key == "dynamicforward":
-                    host_info.dynamic_forward = value
+                    host_info.dynamic_forward = kv[1]
                 if key == "localforward":
-                    host_info.local_forward = value
+                    host_info.local_forward = (kv[1], kv[2])
                 if key == "remoteforward":
-                    host_info.remote_forward = value
+                    host_info.remote_forward = (kv[1], kv[2])
 
             if host_info is not None:
                 hosts.append(host_info)
@@ -83,11 +82,11 @@ class Config:
             if host.dynamic_forward:
                 file.write("\tDynamicForward " + host.dynamic_forward + "\n")
 
-            if host.local_forward:
-                file.write("\tLocalForward " + host.local_forward + "\n")
+            if host.local_forward[0]:
+                file.write("\tLocalForward " + host.local_forward[0] + " " + host.local_forward[1] + "\n")
 
-            if host.remote_forward:
-                file.write("\tRemoteForward " + host.remote_forward + "\n")
+            if host.remote_forward[0]:
+                file.write("\tRemoteForward " + host.remote_forward[0] + " " + host.remote_forward[1] + "\n")
 
             file.write("\n")
 

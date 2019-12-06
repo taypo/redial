@@ -8,8 +8,9 @@ from redial.utils import get_public_ssh_keys
 from urwid.tests.util import SelectableText
 
 
-def textbox(markup):
-    return urwid.AttrWrap(urwid.Edit("", markup), 'dialog_edit', 'dialog_edit_focus')
+def textbox(markup, label=""):
+    return urwid.AttrWrap(urwid.Edit(label, markup, wrap=urwid.widget.CLIP), 'dialog_edit', 'dialog_edit_focus')
+
 
 # TODO validations
 # * special characters
@@ -45,10 +46,14 @@ class AddHostDialog:
         self.dynamic_forward = textbox(target.hostinfo.dynamic_forward)
 
         label_local_forward = urwid.Text("Local Forward")
-        self.local_forward = textbox(target.hostinfo.local_forward)
+        self.local_forward_from = textbox(target.hostinfo.local_forward[0], "from ")
+        self.local_forward_to = textbox(target.hostinfo.local_forward[1], "to ")
+        self.local_forward = urwid.Columns([self.local_forward_from, self.local_forward_to])
 
         label_remote_forward = urwid.Text("Remote Forward")
-        self.remote_forward = textbox(target.hostinfo.remote_forward)
+        self.remote_forward_from = textbox(target.hostinfo.remote_forward[0], "from ")
+        self.remote_forward_to = textbox(target.hostinfo.remote_forward[1], "to ")
+        self.remote_forward = urwid.Columns([self.remote_forward_from, self.remote_forward_to])
 
         # Header
         self.header_text = 'Edit Connection' if self.target.name else 'Add Connection'
@@ -76,17 +81,17 @@ class AddHostDialog:
 
         self.body = urwid.Filler(
             urwid.Pile([
-                urwid.Columns([label_pile, edit_pile]),
+                urwid.Columns([('weight', 1, label_pile), ('weight', 2, edit_pile)]),
                 self.advanced_btn,
                 self.footer
-                ])
+            ])
         )
 
-        self.advanced_body =urwid.Filler(
+        self.advanced_body = urwid.Filler(
             urwid.Pile([
-                urwid.Columns([advanced_label_pile, advanced_edit_pile]),
+                urwid.Columns([('weight', 1, advanced_label_pile), ('weight', 2, advanced_edit_pile)]),
                 self.footer
-                ])
+            ])
         )
 
     def show(self, loop):
@@ -100,7 +105,7 @@ class AddHostDialog:
                 "dialog"),
             bottom_w=loop.widget,
             align='center',
-            width=40,
+            width=64,
             valign='middle',
             height=11 if self.show_advanced else 8
         )
@@ -118,8 +123,8 @@ class AddHostDialog:
         host_info.port = self.port.edit_text
         host_info.identity_file = self.id_file.edit_text
         host_info.dynamic_forward = self.dynamic_forward.edit_text
-        host_info.local_forward = self.local_forward.edit_text
-        host_info.remote_forward = self.remote_forward.edit_text
+        host_info.local_forward = (self.local_forward_from.edit_text, self.local_forward_to.edit_text)
+        host_info.remote_forward = (self.remote_forward_from.edit_text, self.remote_forward_to.edit_text)
 
         self.target.name = self.connection_name.edit_text
         self.target.hostinfo = host_info
