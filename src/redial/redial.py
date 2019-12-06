@@ -23,6 +23,8 @@ class RedialApplication:
 
     def __init__(self):
         self.sessions = Config().load_from_file()
+        #self.state: State = Config().load_state()
+
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
@@ -160,6 +162,9 @@ def run():
                     break
                 else:
                     app.command_return_key = 0
+
+    #app.state.selected = app.walker.get_focus()
+    Config().save_state(vars(State.focused.get_node().get_value()))
 
 
 def sigint_handler(app, signum, frame):
