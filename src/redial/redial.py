@@ -28,6 +28,9 @@ class RedialApplication:
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
+
+        self.set_focus_to_path(self.ui_state["selected"])
+
         urwid.connect_signal(self.walker, "modified", lambda: on_focus_change(self.listbox))
         header = urwid.Text("Redial")
         footer = init_footer(self.listbox)
@@ -153,8 +156,17 @@ class RedialApplication:
         path.reverse()
         return path
 
-    def set_focus_to_path(self):
-        pass
+    def set_focus_to_path(self, path: list):
+        focus = self.__find_node(self.sessions, path[1:])
+        self.listbox.set_focus_to_node(focus)
+
+    def __find_node(self, node_tree: list, path: list):
+        if len(path) == 0:
+            return node_tree
+        for node in node_tree.children:
+            if node.name == path[0]:
+                return self.__find_node(node, path[1:])
+
 
 def run():
     app = RedialApplication()
@@ -175,7 +187,7 @@ def run():
                 else:
                     app.command_return_key = 0
 
-    #app.state.selected = app.walker.get_focus()
+    #todo abstract ui_state
     ui_state = dict()
     ui_state["selected"] = app.get_focus_path()
     Config().save_state(ui_state)
