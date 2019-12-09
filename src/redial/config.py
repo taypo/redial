@@ -50,7 +50,7 @@ class Config:
             Config.__append_node_to_file(sessions, "", file)
 
     @staticmethod
-    def save_state(state):
+    def save_state(state: dict):
         with open(Config.__get_or_create_state_file(), "w") as file:
             json.dump(state, file, default=vars)
 

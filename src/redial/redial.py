@@ -23,7 +23,7 @@ class RedialApplication:
 
     def __init__(self):
         self.sessions = Config().load_from_file()
-        #self.state: State = Config().load_state()
+        self.ui_state = Config().load_state()
 
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
@@ -143,6 +143,18 @@ class RedialApplication:
         else:
             self.loop.widget = self.view
 
+    def get_focus_path(self):
+        path = []
+        node = self.listbox.get_focus_path()[0]
+        while node:
+            path.append(node.get_value().name)
+            node = node.get_parent()
+
+        path.reverse()
+        return path
+
+    def set_focus_to_path(self):
+        pass
 
 def run():
     app = RedialApplication()
@@ -164,7 +176,9 @@ def run():
                     app.command_return_key = 0
 
     #app.state.selected = app.walker.get_focus()
-    Config().save_state(vars(State.focused.get_node().get_value()))
+    ui_state = dict()
+    ui_state["selected"] = app.get_focus_path()
+    Config().save_state(ui_state)
 
 
 def sigint_handler(app, signum, frame):
