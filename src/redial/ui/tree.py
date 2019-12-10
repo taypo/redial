@@ -48,6 +48,20 @@ class UITreeListBox(urwid.TreeListBox):
                 return
             start = n
 
+    # todo remove duplicate code with the above method
+    def collapse_node(self, node: Node):
+        start = self.body.focus.get_root()
+        while True:
+            w, n = self.body.get_next(start)
+            if n is None:
+                return
+            if n.get_value() == node:
+                w.expanded = False
+                w.update_expanded_icon()
+                return
+            start = n
+
+
     def keypress(self, size, key):
         if key == "left":
             widget, pos = self.body.get_focus()

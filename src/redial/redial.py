@@ -29,8 +29,15 @@ class RedialApplication:
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
 
+        # load state (refactor)
         if "selected" in self.ui_state:
             self.set_focus_to_path(self.ui_state["selected"])
+
+        if "collapsed" in self.ui_state:
+            collapsed = self.ui_state["collapsed"]
+            for c in collapsed:
+                node = self.__find_node(self.sessions, c[1:])
+                self.listbox.collapse_node(node)
 
         urwid.connect_signal(self.walker, "modified", lambda: on_focus_change(self.listbox))
         header = urwid.Text("Redial")
