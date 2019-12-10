@@ -29,7 +29,8 @@ class RedialApplication:
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
 
-        self.set_focus_to_path(self.ui_state["selected"])
+        if "selected" in self.ui_state:
+            self.set_focus_to_path(self.ui_state["selected"])
 
         urwid.connect_signal(self.walker, "modified", lambda: on_focus_change(self.listbox))
         header = urwid.Text("Redial")
@@ -147,14 +148,7 @@ class RedialApplication:
             self.loop.widget = self.view
 
     def get_focus_path(self):
-        path = []
-        node = self.listbox.get_focus_path()[0]
-        while node:
-            path.append(node.get_value().name)
-            node = node.get_parent()
-
-        path.reverse()
-        return path
+        return get_path(self.listbox.get_focus_path()[0])
 
     def set_focus_to_path(self, path: list):
         focus = self.__find_node(self.sessions, path[1:])
@@ -190,7 +184,34 @@ def run():
     #todo abstract ui_state
     ui_state = dict()
     ui_state["selected"] = app.get_focus_path()
+
+    parent: UIParentNode = app.walker.focus.get_root()
+    ui_state["collapsed"] = find_collapsed(parent._children)
+
     Config().save_state(ui_state)
+
+
+def find_collapsed(nodes):
+    collapsed = []
+    for key in nodes:
+        node = nodes[key]
+        if isinstance(node, UITreeNode):
+            continue
+        collapsed.extend(find_collapsed(node._children))
+        if node.get_widget().expanded is False:
+            collapsed.append(get_path(node))
+    return collapsed
+
+
+def get_path(node: UITreeNode) -> list:
+    path = []
+
+    while node:
+        path.append(node.get_value().name)
+        node = node.get_parent()
+
+    path.reverse()
+    return path
 
 
 def sigint_handler(app, signum, frame):

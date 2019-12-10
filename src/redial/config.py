@@ -52,12 +52,15 @@ class Config:
     @staticmethod
     def save_state(state: dict):
         with open(Config.__get_or_create_state_file(), "w") as file:
-            json.dump(state, file, default=vars)
+            json.dump(state, file, default=vars, indent=4)
 
     @staticmethod
     def load_state() -> dict:
         with open(Config.__get_or_create_state_file(), "r") as file:
-            return json.load(file)
+            try:
+                return json.load(file)
+            except json.decoder.JSONDecodeError:
+                return {}
 
     # Private Methods
     __CONFIG_PATH = xdg.get_config_dir()
