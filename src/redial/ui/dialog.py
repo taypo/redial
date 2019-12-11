@@ -7,7 +7,9 @@ from redial.tree.node import Node
 from redial.utils import get_public_ssh_keys
 from urwid.tests.util import SelectableText
 
-
+# TODO validations
+# * special characters
+# * identity file exists
 class AddHostDialog:
 
     def __init__(self, parent: Node, target: Node, on_close):
@@ -20,6 +22,7 @@ class AddHostDialog:
         self.ip = urwid.Edit("IP: ", target.hostinfo.ip)
         self.username = urwid.Edit("Username: ", target.hostinfo.username)
         self.port = urwid.Edit("Port: ", target.hostinfo.port if self.target.name else "22")
+        self.id_file = urwid.Edit("Private Key Path: ", target.hostinfo.identity_file)
 
     def show(self, loop):
         # Header
@@ -36,7 +39,13 @@ class AddHostDialog:
         footer = urwid.GridFlow([save_btn, cancel_btn], 12, 1, 1, 'center')
 
         body = urwid.Filler(
-            urwid.Pile([self.connection_name, self.ip, self.username, self.port, footer])
+            urwid.Pile([
+                self.connection_name,
+                self.ip,
+                self.username,
+                self.port,
+                self.id_file,
+                footer])
         )
 
         # Layout
@@ -60,8 +69,9 @@ class AddHostDialog:
     def on_save(self, args=None):
         host_info = HostInfo(self.connection_name.edit_text)
         host_info.ip = self.ip.edit_text
-        host_info.port = self.port.edit_text
         host_info.username = self.username.edit_text
+        host_info.port = self.port.edit_text
+        host_info.identity_file = self.id_file.edit_text
 
         self.target.name = self.connection_name.edit_text
         self.target.hostinfo = host_info

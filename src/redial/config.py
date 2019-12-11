@@ -17,7 +17,7 @@ class Config:
                     continue
                 kv = line.split(' ')
 
-                key = kv[0].lower()
+                key = kv[0].lower()  # SSH config file keys are case insensitive
                 value = kv[1]
 
                 if key == "host":
@@ -31,6 +31,8 @@ class Config:
                     host_info.username = value
                 if key == "port":
                     host_info.port = value
+                if key == "identity_file":
+                    host_info.identity_file = value
 
             if host_info is not None:
                 hosts.append(host_info)
@@ -63,10 +65,15 @@ class Config:
                 Config.__append_node_to_file(child, sub_path, file)
         else:
             session_name = (path + "/" + node.name).lstrip("/")
+            host = node.hostinfo
             file.write("Host " + session_name + "\n")
-            file.write("\thostname " + node.hostinfo.ip + "\n")
-            file.write("\tuser " + node.hostinfo.username + "\n")
-            file.write("\tport " + node.hostinfo.port + "\n")
+            file.write("\tHostName " + host.ip + "\n")
+            file.write("\tUser " + host.username + "\n")
+            file.write("\tPort " + host.port + "\n")
+
+            if host.identity_file:
+                file.write("\tIdentityFile " + host.identity_file + "\n")
+
             file.write("\n")
 
     @staticmethod

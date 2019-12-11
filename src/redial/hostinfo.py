@@ -5,6 +5,7 @@ class HostInfo:
     ip = ""
     port = ""
     username = ""
+    identity_file = ""
 
     def __init__(self, full_name):
         self.full_name = full_name
@@ -27,6 +28,9 @@ class HostInfo:
 
     def get_ssh_command(self):
         c = "ssh "
+
+        if self.identity_file:
+            c = c + "-i " + self.identity_file + " "
 
         if self.username:
             c = c + self.username + "@"
