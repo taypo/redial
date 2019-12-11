@@ -10,34 +10,20 @@ from redial.ui.footer import init_footer
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
 from redial.utils import package_available, get_public_ssh_keys
+from redial.uistate import save_ui_state, restore_ui_state
 from functools import partial
-
-EXIT_REDIAL = "__EXIT__"
-
-
-def on_focus_change(listbox):
-    State.focused = listbox.get_focus()[0]
 
 
 class RedialApplication:
 
     def __init__(self):
         self.sessions = Config().load_from_file()
-        self.ui_state = Config().load_state()
 
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
 
-        # load state (refactor)
-        if "selected" in self.ui_state:
-            self.set_focus_to_path(self.ui_state["selected"])
-
-        if "collapsed" in self.ui_state:
-            collapsed = self.ui_state["collapsed"]
-            for c in collapsed:
-                node = self.__find_node(self.sessions, c[1:])
-                self.listbox.collapse_node(node)
+        restore_ui_state(self.listbox, self.sessions)
 
         urwid.connect_signal(self.walker, "modified", lambda: on_focus_change(self.listbox))
         header = urwid.Text("Redial")
@@ -154,19 +140,12 @@ class RedialApplication:
         else:
             self.loop.widget = self.view
 
-    def get_focus_path(self):
-        return get_path(self.listbox.get_focus_path()[0])
 
-    def set_focus_to_path(self, path: list):
-        focus = self.__find_node(self.sessions, path[1:])
-        self.listbox.set_focus_to_node(focus)
+EXIT_REDIAL = "__EXIT__"
 
-    def __find_node(self, node_tree: list, path: list):
-        if len(path) == 0:
-            return node_tree
-        for node in node_tree.children:
-            if node.name == path[0]:
-                return self.__find_node(node, path[1:])
+
+def on_focus_change(listbox):
+    State.focused = listbox.get_focus()[0]
 
 
 def run():
@@ -188,37 +167,7 @@ def run():
                 else:
                     app.command_return_key = 0
 
-    #todo abstract ui_state
-    ui_state = dict()
-    ui_state["selected"] = app.get_focus_path()
-
-    parent: UIParentNode = app.walker.focus.get_root()
-    ui_state["collapsed"] = find_collapsed(parent._children)
-
-    Config().save_state(ui_state)
-
-
-def find_collapsed(nodes):
-    collapsed = []
-    for key in nodes:
-        node = nodes[key]
-        if isinstance(node, UITreeNode):
-            continue
-        collapsed.extend(find_collapsed(node._children))
-        if node.get_widget().expanded is False:
-            collapsed.append(get_path(node))
-    return collapsed
-
-
-def get_path(node: UITreeNode) -> list:
-    path = []
-
-    while node:
-        path.append(node.get_value().name)
-        node = node.get_parent()
-
-    path.reverse()
-    return path
+    save_ui_state(app.listbox)
 
 
 def sigint_handler(app, signum, frame):

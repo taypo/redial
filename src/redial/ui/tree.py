@@ -61,7 +61,6 @@ class UITreeListBox(urwid.TreeListBox):
                 return
             start = n
 
-
     def keypress(self, size, key):
         if key == "left":
             widget, pos = self.body.get_focus()
