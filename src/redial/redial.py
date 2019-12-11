@@ -10,22 +10,21 @@ from redial.ui.footer import init_footer
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
 from redial.utils import package_available, get_public_ssh_keys
+from redial.uistate import save_ui_state, restore_ui_state
 from functools import partial
-
-EXIT_REDIAL = "__EXIT__"
-
-
-def on_focus_change(listbox):
-    State.focused = listbox.get_focus()[0]
 
 
 class RedialApplication:
 
     def __init__(self):
         self.sessions = Config().load_from_file()
+
         top_node = UIParentNode(self.sessions, key_handler=self.on_key_press)
         self.walker = urwid.TreeWalker(top_node)
         self.listbox = UITreeListBox(self.walker)
+
+        restore_ui_state(self.listbox, self.sessions)
+
         urwid.connect_signal(self.walker, "modified", lambda: on_focus_change(self.listbox))
         header = urwid.Text("Redial")
         footer = init_footer(self.listbox)
@@ -142,6 +141,13 @@ class RedialApplication:
             self.loop.widget = self.view
 
 
+EXIT_REDIAL = "__EXIT__"
+
+
+def on_focus_change(listbox):
+    State.focused = listbox.get_focus()[0]
+
+
 def run():
     app = RedialApplication()
 
@@ -160,6 +166,8 @@ def run():
                     break
                 else:
                     app.command_return_key = 0
+
+    save_ui_state(app.listbox)
 
 
 def sigint_handler(app, signum, frame):

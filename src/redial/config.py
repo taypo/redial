@@ -1,7 +1,7 @@
 from redial import xdg
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-import os
+import os, json
 
 
 class Config:
@@ -45,17 +45,39 @@ class Config:
         return Config.__construct_tree(hosts)
 
     @staticmethod
-    def save_to_file( sessions):
+    def save_to_file(sessions):
         with open(Config.__get_or_create_config_file(), "w") as file:
             Config.__append_node_to_file(sessions, "", file)
+
+    @staticmethod
+    def save_state(state: dict):
+        with open(Config.__get_or_create_state_file(), "w") as file:
+            json.dump(state, file, default=vars, indent=4)
+
+    @staticmethod
+    def load_state() -> dict:
+        with open(Config.__get_or_create_state_file(), "r") as file:
+            try:
+                return json.load(file)
+            except json.decoder.JSONDecodeError:
+                return {}
 
     # Private Methods
     __CONFIG_PATH = xdg.get_config_dir()
     __CONFIG_FILE = "sessions"
+    __STATE_FILE = "state.json"
 
     @staticmethod
     def __get_or_create_config_file() -> str:
         full_path = Config.__CONFIG_PATH + "/" + Config.__CONFIG_FILE
+        if not os.path.isfile(full_path):
+            file = open(full_path, "w")
+            file.close()
+        return full_path
+
+    @staticmethod
+    def __get_or_create_state_file() -> str:
+        full_path = Config.__CONFIG_PATH + "/" + Config.__STATE_FILE
         if not os.path.isfile(full_path):
             file = open(full_path, "w")
             file.close()
