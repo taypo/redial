@@ -17,6 +17,8 @@ palette = [
     ('dialog', 'dark red', 'light blue', '', 'g0', '#a8a'),
     ('dialog_button', 'dark red', 'light blue', '', '#600', '#a8a'),
     ('dialog_button_focus', 'dark red', 'light blue', '', '#600', '#d86'),
+    ('dialog_edit', 'dark red', 'light blue', '', '#600', '#a8a'),
+    ('dialog_edit_focus', 'dark red', 'light blue', '', '#600', '#d86'),
     ('ssh_copy', 'dark red', 'dark red', '', '#600', '#a8a'),
     ('ssh_copy_focus', 'dark red', 'dark red', '', '#600', '#d86'),
     #(name, foreground, background, mono, foreground_high, background_high)
