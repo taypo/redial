@@ -15,29 +15,34 @@ class Config:
                 line = f_line.strip()
                 if line.startswith('#') or not line:
                     continue
-                kv = line.split(' ')
+                kv = list(filter(None, line.split(' ')))
 
                 key = kv[0].lower()  # SSH config file keys are case insensitive
 
-                if key == "host":
-                    if host_info is not None:
-                        hosts.append(host_info)
-
-                    host_info = HostInfo(kv[1])
-                if key == "hostname":
-                    host_info.ip = kv[1]
-                if key == "user":
-                    host_info.username = kv[1]
-                if key == "port":
-                    host_info.port = kv[1]
-                if key == "identityfile":
-                    host_info.identity_file = kv[1]
-                if key == "dynamicforward":
-                    host_info.dynamic_forward = kv[1]
-                if key == "localforward":
-                    host_info.local_forward = (kv[1], kv[2])
-                if key == "remoteforward":
-                    host_info.remote_forward = (kv[1], kv[2])
+                try:
+                    if key == "host":
+                        if host_info is not None:
+                            hosts.append(host_info)
+                        if len(kv) == 1:
+                            host_info = None
+                        else:
+                            host_info = HostInfo(kv[1])
+                    if key == "hostname" and host_info:
+                        host_info.ip = kv[1]
+                    if key == "user" and host_info:
+                        host_info.username = kv[1]
+                    if key == "port" and host_info:
+                        host_info.port = kv[1]
+                    if key == "identityfile" and host_info:
+                        host_info.identity_file = kv[1]
+                    if key == "dynamicforward" and host_info:
+                        host_info.dynamic_forward = kv[1]
+                    if key == "localforward" and host_info:
+                        host_info.local_forward = (kv[1], kv[2])
+                    if key == "remoteforward" and host_info:
+                        host_info.remote_forward = (kv[1], kv[2])
+                except IndexError:
+                    continue
 
             if host_info is not None:
                 hosts.append(host_info)
@@ -95,8 +100,12 @@ class Config:
             host = node.hostinfo
             file.write("Host " + session_name + "\n")
             file.write("\tHostName " + host.ip + "\n")
-            file.write("\tUser " + host.username + "\n")
-            file.write("\tPort " + host.port + "\n")
+
+            if host.username:
+                file.write("\tUser " + host.username + "\n")
+
+            if host.port:
+                file.write("\tPort " + host.port + "\n")
 
             if host.identity_file:
                 file.write("\tIdentityFile " + host.identity_file + "\n")
