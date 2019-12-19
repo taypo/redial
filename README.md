@@ -8,6 +8,13 @@ redial is a simple shell application that manages your SSH sessions on Unix term
 
 ![redial](https://github.com/taypo/redial/blob/master/doc/redial.png?raw=true)
 
+## What's New
+
+### 0.7 (19.12.2019)
+- Basic support for adding ssh keys to connections
+- Dynamic, Local and Remote port forwarding settings (only one of each can be defined for now)
+- UI state is restored at startup. Redial now remembers last selected connection and folder expanded/collapsed states
+
 ## Installation
 
 ### Requirements
