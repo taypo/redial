@@ -107,11 +107,7 @@ class RedialApplication:
             if i == len(parent_node.children) - 1: return  # at bottom
             parent_node.children[i], parent_node.children[i + 1] = parent_node.children[i + 1], parent_node.children[i]
 
-            save_ui_state(self.listbox)
-            Config.save_to_file(self.sessions)
-            self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
-            self.listbox.set_focus_to_node(this_node)
-            restore_ui_state(self.listbox, self.sessions)
+            self.save_and_focus(this_node)
 
         elif key in ["meta up", "ctrl up"]:
             if parent_node is None: return
@@ -119,11 +115,7 @@ class RedialApplication:
             if i == 0: return  # at top
             parent_node.children[i], parent_node.children[i - 1] = parent_node.children[i - 1], parent_node.children[i]
 
-            save_ui_state(self.listbox)
-            Config.save_to_file(self.sessions)
-            self.walker.set_focus(UIParentNode(self.sessions, key_handler=self.on_key_press))
-            self.listbox.set_focus_to_node(this_node)
-            restore_ui_state(self.listbox, self.sessions)
+            self.save_and_focus(this_node)
         else:
             return key
 
