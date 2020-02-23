@@ -75,7 +75,7 @@ class RedialApplication:
                     self.loop)
             else:
                 self.log = "SSH key is copied successfully"
-                CopySSHKeyDialog(this_node, self.close_dialog_and_run).show(self.loop)
+                CopySSHKeyDialog(this_node, self.close_dialog_and_run, self.change_log).show(self.loop)
 
         elif key == "f5" and w.is_leaf:
             if package_available(package_name="mc"):
@@ -137,6 +137,9 @@ class RedialApplication:
             raise urwid.ExitMainLoop()
         else:
             self.loop.widget = self.view
+
+    def change_log(self, log):
+        self.log = log
 
 
 EXIT_REDIAL = "__EXIT__"
