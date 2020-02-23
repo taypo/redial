@@ -262,9 +262,10 @@ class SSHListBox(urwid.ListBox):
 
 class CopySSHKeyDialog:
 
-    def __init__(self, target: Node, on_close):
+    def __init__(self, target: Node, on_close, change_log):
         self.target = target
         self.on_close = on_close
+        self.change_log = change_log
 
         # Form Fields
         self.ssh_keys_walker = urwid.SimpleListWalker(
@@ -314,6 +315,7 @@ class CopySSHKeyDialog:
         self.on_close(command)
 
     def on_cancel(self, args):
+        self.change_log(None)
         self.on_close()
 
     def prepare_ssh_list_elements(self):
