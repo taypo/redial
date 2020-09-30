@@ -162,11 +162,11 @@ def run():
                 break
             else:
                 rk = os.system(app.command)
-                if rk != 0:
+                if rk == 33280 or rk == 0:
+                    app.command_return_key = rk
+                else:
                     app.command_return_key = rk
                     break
-                else:
-                    app.command_return_key = 0
 
     save_ui_state(app.listbox)
 
