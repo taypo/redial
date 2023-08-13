@@ -58,7 +58,7 @@ class HostInfo:
         c = "ssh-copy-id -i {} ".format(identity_file)
 
         if self.port:
-            c = c + " -p " + self.port
+            c = c + " -p " + self.port + " "
             
         if self.username:
             c = c + self.username + "@"
