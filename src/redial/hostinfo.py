@@ -57,12 +57,12 @@ class HostInfo:
     def get_ssh_copy_command(self, identity_file):
         c = "ssh-copy-id -i {} ".format(identity_file)
 
+        if self.port:
+            c = c + " -p " + self.port
+            
         if self.username:
             c = c + self.username + "@"
 
         c = c + self.ip
-
-        if self.port:
-            c = c + " -p " + self.port
 
         return c
