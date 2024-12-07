@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from pkg_resources import get_distribution, DistributionNotFound
-
 try:
-    # Change here if project is renamed and does not equal the package name
-    dist_name = __name__
-    __version__ = get_distribution(dist_name).version
-except DistributionNotFound:
-    __version__ = 'unknown'
-finally:
-    del get_distribution, DistributionNotFound
+    from importlib.metadata import version, PackageNotFoundError
+    try:
+        __version__ = version("redial")
+    except PackageNotFoundError:
+        __version__ = 'unknown'
+except ImportError:
+    # Fallback for Python < 3.8
+    from pkg_resources import get_distribution, DistributionNotFound
+    try:
+        __version__ = get_distribution("redial").version
+    except DistributionNotFound:
+        __version__ = 'unknown'
