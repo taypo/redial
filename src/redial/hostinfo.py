@@ -1,17 +1,27 @@
+from typing import Tuple
 
 class HostInfo:
     # TODO rename to name
-    full_name = ""
-    ip = ""
-    port = ""
-    username = ""
-    identity_file = ""
-    dynamic_forward = ""
-    local_forward = ("", "")
-    remote_forward = ("", "")
+    full_name: str = ""
+    ip: str = ""
+    port: str = ""
+    username: str = ""
+    identity_file: str = ""
+    dynamic_forward: str = ""
+    local_forward: Tuple[str, str] = ("", "")
+    remote_forward: Tuple[str, str] = ("", "")
+    proxy_jump: str = ""
 
-    def __init__(self, full_name):
+    def __init__(self, full_name: str):
         self.full_name = full_name
+        self.ip = ""
+        self.port = ""
+        self.username = ""
+        self.identity_file = ""
+        self.dynamic_forward = ""
+        self.local_forward = ("", "")
+        self.remote_forward = ("", "")
+        self.proxy_jump = ""
 
     def get_mc_command(self):
         c = "mc . sh://"
@@ -43,6 +53,9 @@ class HostInfo:
 
         if self.remote_forward[0]:
             c = c + "-R" + self.remote_forward[0] + ":" + self.remote_forward[1] + " "
+
+        if self.proxy_jump:
+            c = c + "-J " + self.proxy_jump + " "
 
         if self.username:
             c = c + self.username + "@"

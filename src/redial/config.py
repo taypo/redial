@@ -27,6 +27,7 @@ class Config:
                             host_info = None
                         else:
                             host_info = HostInfo(kv[1])
+                            host_info.proxy_jump = ""
                     if key == "hostname" and host_info:
                         host_info.ip = kv[1]
                     if key == "user" and host_info:
@@ -41,6 +42,8 @@ class Config:
                         host_info.local_forward = (kv[1], kv[2])
                     if key == "remoteforward" and host_info:
                         host_info.remote_forward = (kv[1], kv[2])
+                    if key == "proxyjump" and host_info:
+                        host_info.proxy_jump = kv[1]
                 except IndexError:
                     continue
 
@@ -118,6 +121,9 @@ class Config:
 
             if host.remote_forward[0]:
                 file.write("\tRemoteForward " + host.remote_forward[0] + " " + host.remote_forward[1] + "\n")
+
+            if host.proxy_jump:
+                file.write("\tProxyJump " + host.proxy_jump + "\n")
 
             file.write("\n")
 
