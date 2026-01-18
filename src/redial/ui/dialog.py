@@ -55,6 +55,9 @@ class AddHostDialog:
         self.remote_forward_to = textbox(target.hostinfo.remote_forward[1], "to ")
         self.remote_forward = urwid.Columns([self.remote_forward_from, self.remote_forward_to])
 
+        label_proxy_jump = urwid.Text("ProxyJump")
+        self.proxy_jump = textbox(target.hostinfo.proxy_jump if hasattr(target.hostinfo, 'proxy_jump') else "")
+
         # Header
         self.header_text = 'Edit Connection' if self.target.name else 'Add Connection'
 
@@ -75,9 +78,9 @@ class AddHostDialog:
         edit_pile = urwid.Pile([self.connection_name, self.ip, self.username, self.port])
 
         advanced_label_pile = urwid.Pile([label_connection_name, label_ip, label_username, label_port, label_id_file,
-                                          label_dynamic_forward, label_local_forward, label_remote_forward])
+                                          label_dynamic_forward, label_local_forward, label_remote_forward, label_proxy_jump])
         advanced_edit_pile = urwid.Pile([self.connection_name, self.ip, self.username, self.port, self.id_file,
-                                         self.dynamic_forward, self.local_forward, self.remote_forward])
+                                         self.dynamic_forward, self.local_forward, self.remote_forward, self.proxy_jump])
 
         self.body = urwid.Filler(
             urwid.Pile([
@@ -125,6 +128,7 @@ class AddHostDialog:
         host_info.dynamic_forward = self.dynamic_forward.edit_text
         host_info.local_forward = (self.local_forward_from.edit_text, self.local_forward_to.edit_text)
         host_info.remote_forward = (self.remote_forward_from.edit_text, self.remote_forward_to.edit_text)
+        host_info.proxy_jump = self.proxy_jump.edit_text
 
         self.target.name = self.connection_name.edit_text
         self.target.hostinfo = host_info
@@ -391,3 +395,61 @@ class DialogOverlay(urwid.Overlay):
         # TODO: implement, save with "enter"
 
         super().keypress(size, key)
+
+
+class RemoveFolderDialog:
+    def __init__(self, parent: Node, target: Node, on_close):
+        self.parent = parent
+        self.target = target
+        self.on_close = on_close
+
+    def show(self, loop):
+        # Header
+        header_text = urwid.Text('Remove Folder: ' + self.target.name, align='center')
+        header = urwid.AttrMap(header_text, 'dialog')
+
+        # Body warning if not empty
+        warning = "Folder is not empty. All contents will be removed." if self.target.children else "Are you sure?"
+
+        # Footer
+        ok_btn = urwid.Button('Ok', self.on_ok)
+        ok_btn = urwid.AttrWrap(ok_btn, 'dialog_button', 'dialog_button_focus')
+
+        cancel_btn = urwid.Button('Cancel', self.on_cancel)
+        cancel_btn = urwid.AttrWrap(cancel_btn, 'dialog_button', 'dialog_button_focus')
+
+        footer = urwid.GridFlow([ok_btn, cancel_btn], 12, 1, 1, 'center')
+
+        body = urwid.Filler(
+            urwid.Pile([
+                urwid.Text(warning),
+                urwid.Text(""),
+                footer
+            ])
+        )
+
+        # Layout
+        layout = urwid.Frame(
+            body,
+            header=header
+        )
+
+        w = DialogOverlay(
+            on_close=lambda: self.on_close(self.parent),
+            on_enter=lambda: self.on_ok(None),
+            top_w=urwid.AttrMap(urwid.LineBox(layout), "dialog"),
+            bottom_w=loop.widget,
+            align='center',
+            width=40,
+            valign='middle',
+            height=10
+        )
+
+        loop.widget = w
+
+    def on_ok(self, args):
+        self.parent.remove_child(self.target)
+        self.on_close(self.parent)
+
+    def on_cancel(self, args):
+        self.on_close(self.target)

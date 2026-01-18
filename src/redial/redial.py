@@ -1,11 +1,12 @@
 import os
 import signal
+import typing
 
 import urwid
 from redial.config import Config
 from redial.hostinfo import HostInfo
 from redial.tree.node import Node
-from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog, CopySSHKeyDialog
+from redial.ui.dialog import AddHostDialog, MessageDialog, AddFolderDialog, RemoveHostDialog, CopySSHKeyDialog, RemoveFolderDialog
 from redial.ui.footer import init_footer
 from redial.ui.tree import UIParentNode, UITreeWidget, UITreeNode, UITreeListBox, State
 from redial.ui.palette import palette
@@ -41,7 +42,7 @@ class RedialApplication:
 
         # instance attributes
         self.command = None
-        self.command_return_key = None
+        self.command_return_key = None  # type: int | None
         self.log = None
 
     def run(self):
@@ -92,11 +93,14 @@ class RedialApplication:
             AddHostDialog(folder_node, Node("", "session", HostInfo("")), self.save_and_focus).show(self.loop)
 
         elif key == "f8":
-            if this_node.nodetype == "folder":
-                # TODO implement removing folder
-                MessageDialog("Error", "Folders can not be removed", self.close_dialog).show(self.loop)
+            if parent_node is None:
+                MessageDialog("Error", "Root folder cannot be removed", self.close_dialog).show(self.loop)
             else:
-                RemoveHostDialog(parent_node, this_node, self.save_and_focus).show(self.loop)
+                parent_node_typed = typing.cast(Node, parent_node)
+                if this_node.nodetype == "folder":
+                    RemoveFolderDialog(parent_node_typed, this_node, self.save_and_focus).show(self.loop)
+                else:
+                    RemoveHostDialog(parent_node_typed, this_node, self.save_and_focus).show(self.loop)
 
         elif key == "f9" and w.is_leaf:
             AddHostDialog(parent_node, this_node, self.save_and_focus).show(self.loop)
