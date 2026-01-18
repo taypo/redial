@@ -126,6 +126,30 @@ sed -i -e '1iInclude ~/.config/redial/sessions' ~/.ssh/config
 
 Windows is currently not supported.
 
+## Development
+
+To set up a local development environment:
+
+```bash
+git clone https://github.com/taypo/redial.git
+cd redial
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -e .
+```
+
+Run redial:
+
+```bash
+redial
+```
+
+Or run directly as a module:
+
+```bash
+python -m redial
+```
+
 ## License
 
 redial is licensed under the [GNU General Public License v3.0](LICENSE).
